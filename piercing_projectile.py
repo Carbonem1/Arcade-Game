@@ -27,15 +27,15 @@ class PiercingProjectile(Projectile):
         Projectile.piercing_projectile_list.append(self)
 
     def drawProjectile(self, game, color, erase_color):
-        old_normal_projectile = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
-        normal_projectile = pygame.draw.circle(game, color, (self.x_coordinate, self.y_coordinate), self.size, 0)
+        old_piercing_projectile = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
+        piercing_projectile = pygame.draw.circle(game, color, (self.x_coordinate, self.y_coordinate), self.size, 0)
 
         self.old_x_coordinate = self.x_coordinate
         self.old_y_coordinate = self.y_coordinate
 
     def remove(self, game, erase_color):
-        remove_old_normal_projectile = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
-        remove_normal_projectile = pygame.draw.circle(game, erase_color, (self.x_coordinate, self.y_coordinate), self.size, 0)
+        remove_old_piercing_projectile = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
+        remove_piercing_projectile = pygame.draw.circle(game, erase_color, (self.x_coordinate, self.y_coordinate), self.size, 0)
         Projectile.projectile_list.remove(self)
 
     def move(self):

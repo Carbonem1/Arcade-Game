@@ -21,3 +21,9 @@ class Projectile:
 
     def getPiercingProjectileList(self):
         return self.piercing_projectile_list
+
+    def getSlope(self, mouse_x, mouse_y):
+        x_delta = self.x - mouse_x
+        y_delta = self.y - mouse.y
+
+        return x_delta/y_delta

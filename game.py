@@ -168,7 +168,7 @@ while True:
 
     # draw the text's background rectangle onto the surface
     pygame.draw.rect(DISPLAYSURF, WHITE, (textRect.left, textRect.top, textRect.width, textRect.height))
-    
+
     # draw the text onto the surface
     text = basicFont.render("Score: " + str(statistics.total_kills), True, WHITE, BLACK)
     DISPLAYSURF.blit(text, textRect)
