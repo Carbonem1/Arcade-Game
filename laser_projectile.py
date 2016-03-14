@@ -24,7 +24,7 @@ class LaserProjectile(Projectile):
         self.old_y_coordinate = self.y_coordinate
         self.direction = character.direction
         Projectile.projectile_count += 1
-        Projectile.piercing_projectile_list.append(self)
+        Projectile.laser_projectile_list.append(self)
 
     def drawProjectile(self, game, color, erase_color):
         old_laser_projectile = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
@@ -39,12 +39,7 @@ class LaserProjectile(Projectile):
         Projectile.projectile_list.remove(self)
 
     def move(self, mouse_x, mouse_y):
-        if self.speed_count == self.speed:
-            movement = (mouse_x - self.x_coordinate, mouse_y - self.y_coordinate)
-            self.x_coordinate = movement[0]
-            self.y_coordinate = movement[1]
-            self.speed_count = 0
-
-        self.speed_count += 1
+        self.x_coordinate = mouse_x
+        self.y_coordinate = mouse_y
 
         return

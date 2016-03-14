@@ -287,7 +287,7 @@ while True:
     # set all projectiles in motion
     for projectile in proj.getProjectileList():
         if (-20 < projectile.x_coordinate < config.display_x + 20) and (-20 < projectile.y_coordinate < config.display_y + 20):
-                projectile.move()
+                projectile.move(mouse_x, mouse_y)
         else:
             projectile.remove(DISPLAYSURF, BLACK)
 

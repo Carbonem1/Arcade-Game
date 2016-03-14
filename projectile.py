@@ -4,6 +4,7 @@ class Projectile:
     projectile_count = -1
     projectile_list = []
     piercing_projectile_list = []
+    laser_projectile_list = []
 
     def __init__(self, projectile):
         if self.projectile_count == -1:
@@ -21,6 +22,9 @@ class Projectile:
 
     def getPiercingProjectileList(self):
         return self.piercing_projectile_list
+
+    def getLaserProjectileList(self):
+        return self.laser_projectile_list
 
     def getSlope(self, mouse_x, mouse_y):
         x_delta = self.x - mouse_x

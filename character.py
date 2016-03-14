@@ -10,6 +10,7 @@ from enemy import Enemy
 from projectile import Projectile
 from basic_projectile import BasicProjectile
 from piercing_projectile import PiercingProjectile
+from laser_projectile import LaserProjectile
 
 class Character():
     size = 40
@@ -59,7 +60,7 @@ class Character():
 
     def shoot(self, game, color, erase_color, character, mouse_x, mouse_y):
         character.getDirection(mouse_x, mouse_y)
-        proj = PiercingProjectile(character)
+        proj = LaserProjectile(character)
 
         return
 

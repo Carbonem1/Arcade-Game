@@ -11,6 +11,7 @@ from enemy import Enemy
 class RedEnemy(Enemy):
     size = 6
     length = 500
+    # lower accuracy value = more accurate
     accuracy = 5
     accuracy_count = 0
 
@@ -19,6 +20,7 @@ class RedEnemy(Enemy):
 
     location_list = []
 
+    # lower speed value = faster
     spawn_speed = 4000
     spawn_speed_count = 0
     speed = 8
