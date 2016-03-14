@@ -5,6 +5,7 @@ import pygame
 import sys
 from pygame.locals import *
 
+import math
 import random
 from random import randint
 
@@ -81,7 +82,7 @@ background_color = BLACK
 DISPLAYSURF.fill(background_color)
 
 # player init coordinates
-my_character = Character(400, 300, ("purple", "1", ""))
+my_character = Character(400, 300, ("red", "1", ""))
 
 # player projectile
 proj = BasicProjectile(my_character)
@@ -100,7 +101,7 @@ red_enemy = RedEnemy(0, 0)
 mouse_x = 0
 mouse_y = 0
 
-# set up fontsd
+# set up fonts
 basicFont = pygame.font.SysFont(None, 30)
 # set up the text for the menu
 menuText = basicFont.render("Welcome to " + config.game_name + "! Pick a ship.", True, WHITE, BLACK)
@@ -109,6 +110,10 @@ menuRect = menuText.get_rect()
 # set up the text for score
 text = basicFont.render("Score: ", True, WHITE, BLACK)
 textRect = text.get_rect()
+
+# attempt ship rotate to cursor
+#mousec = pygame.image.load(mouse_c).convert_alpha()
+space_ship = pygame.image.load("images/ships/blue/1/-north.png").convert_alpha()
 
 while True:
     # draw the main menu
@@ -163,6 +168,7 @@ while True:
 
     # draw the text's background rectangle onto the surface
     pygame.draw.rect(DISPLAYSURF, WHITE, (textRect.left, textRect.top, textRect.width, textRect.height))
+    
     # draw the text onto the surface
     text = basicFont.render("Score: " + str(statistics.total_kills), True, WHITE, BLACK)
     DISPLAYSURF.blit(text, textRect)

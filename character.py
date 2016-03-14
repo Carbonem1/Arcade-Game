@@ -4,6 +4,8 @@ import pygame
 import sys
 from pygame.locals import *
 
+import math
+
 from enemy import Enemy
 from projectile import Projectile
 from basic_projectile import BasicProjectile
@@ -32,32 +34,18 @@ class Character():
         self.old_y_coordinate = y_start
         self.ship_color, self.ship_rank, self.ship_name = image
         if not image == None:
-            self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-north.png")
+            self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-east.png")
             self.image_rect = self.image.get_rect()
 
     def drawCharacter(self, game, color, erase_color, mouse_x = 0, mouse_y = 0):
-        # if a ship is specified, load the ships direction
+        # if a ship is specified, get the ships direction and angle
         if not self.image == None:
-            direction = self.getDirection(mouse_x, mouse_y)
-            if direction == "NORTH":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-north.png")
-            if direction == "SOUTH":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-south.png")
-            if direction == "EAST":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-east.png")
-            if direction == "WEST":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-west.png")
-            if direction == "NORTHEAST":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-northeast.png")
-            if direction == "NORTHWEST":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-northwest.png")
-            if direction == "SOUTHEAST":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-southeast.png")
-            if direction == "SOUTHWEST":
-                self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-southwest.png")
-
+            pos = mouse_x, mouse_y
+            angle = 360 - math.atan2(pos[1] - self.y_coordinate, pos[0] - self.x_coordinate) * 180 / math.pi
+            rotimage = pygame.transform.rotate(self.image, angle)
+            rect = rotimage.get_rect(center=(self.x_coordinate, self.y_coordinate))
             my_old_character = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size+10, 0)
-            game.blit(self.image, (self.x_coordinate-self.size, self.y_coordinate-self.size))
+            game.blit(rotimage, (self.x_coordinate-rotimage.get_width()/2, self.y_coordinate-rotimage.get_height()/2))
         else:
             # erase our old character position and draw the new one
             my_old_character = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
