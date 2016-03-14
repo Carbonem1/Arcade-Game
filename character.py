@@ -60,6 +60,7 @@ class Character():
     def drawCharacter(self, game, color, erase_color, mouse_x = 0, mouse_y = 0):
         # if a ship is specified, get the ships direction and angle
         if not self.image == None:
+            self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-east.png")
             pos = mouse_x, mouse_y
             angle = 360 - math.atan2(pos[1] - self.y_coordinate, pos[0] - self.x_coordinate) * 180 / math.pi
             rotimage = pygame.transform.rotate(self.image, angle)

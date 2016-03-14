@@ -82,7 +82,7 @@ background_color = BLACK
 DISPLAYSURF.fill(background_color)
 
 # player init coordinates
-my_character = Character(400, 300, "1", ("red", "1", ""))
+my_character = Character(config.display_x//2, config.display_y//2, "1", ("red", "1", ""))
 
 # player projectile
 proj = BasicProjectile(my_character)
