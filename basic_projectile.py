@@ -37,7 +37,7 @@ class BasicProjectile(Projectile):
         remove_normal_projectile = pygame.draw.circle(game, erase_color, (self.x_coordinate, self.y_coordinate), self.size, 0)
         Projectile.projectile_list.remove(self)
 
-    def move(self):
+    def move(self, mouse_x, mouse_y):
         if self.speed_count == self.speed:
             if self.direction == "EAST":
                 self.x_coordinate += 1

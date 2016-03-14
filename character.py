@@ -16,27 +16,46 @@ class Character():
     size = 40
     speed = 3
     speed_count = 0
+
     x_coordinate = 0
     y_coordinate = 0
     old_x_coordinate = 0
     old_y_coordinate = 0
+
+    current_projectile = None
+
     legal_moves = []
     direction = None
+
     ship_color = None
     ship_rank = None
     ship_name = None
     image = None
     image_rect = (0, 0)
 
-    def __init__(self, x_start, y_start, image = None):
+    def __init__(self, x_start, y_start, projectile = None, image = None):
         self.x_coordinate = x_start
         self.y_coordinate = y_start
         self.old_x_coordinate = x_start
         self.old_y_coordinate = y_start
+
+        self.current_projectile = projectile
+
         self.ship_color, self.ship_rank, self.ship_name = image
         if not image == None:
             self.image = pygame.image.load("images/ships/" + self.ship_color + "/" + self.ship_rank + "/" + self.ship_name + "-east.png")
             self.image_rect = self.image.get_rect()
+
+    def getProjectile(self):
+        if self.current_projectile == "0":
+            return BasicProjectile(self)
+        if self.current_projectile == "1":
+            return PiercingProjectile(self)
+        if self.current_projectile == "2":
+            return LaserProjectile(self)
+
+        else:
+             return
 
     def drawCharacter(self, game, color, erase_color, mouse_x = 0, mouse_y = 0):
         # if a ship is specified, get the ships direction and angle
@@ -60,7 +79,7 @@ class Character():
 
     def shoot(self, game, color, erase_color, character, mouse_x, mouse_y):
         character.getDirection(mouse_x, mouse_y)
-        proj = LaserProjectile(character)
+        proj = character.getProjectile()
 
         return
 
