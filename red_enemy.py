@@ -10,7 +10,8 @@ from enemy import Enemy
 
 class RedEnemy(Enemy):
     size = 6
-    length = 500
+    length = 150
+
     # lower accuracy value = more accurate
     accuracy = 5
     accuracy_count = 0
@@ -67,24 +68,24 @@ class RedEnemy(Enemy):
         if self.speed_count == self.speed:
             if self.accuracy_count >= self.accuracy:
                 if self.x_coordinate - character.x_coordinate >= 0:
-                    self.x_coordinate -= 1
+                    self.x_coordinate -= 3
                 else:
-                    self.x_coordinate += 1
+                    self.x_coordinate += 3
 
                 if self.y_coordinate - character.y_coordinate > 0:
-                    self.y_coordinate -= 1
+                    self.y_coordinate -= 3
                 else:
-                    self.y_coordinate += 1
+                    self.y_coordinate += 3
 
                 if self.x_coordinate - character.x_coordinate > 0:
-                    self.x_coordinate -= 1
+                    self.x_coordinate -= 3
                 else:
-                    self.x_coordinate += 1
+                    self.x_coordinate += 3
 
                 if self.y_coordinate - character.y_coordinate > 0:
-                    self.y_coordinate -= 1
+                    self.y_coordinate -= 3
                 else:
-                    self.y_coordinate += 1
+                    self.y_coordinate += 3
                 self.speed_count = 0
                 self.accuracy_count = 0
 
