@@ -19,8 +19,6 @@ class RedEnemy(Enemy):
     x_coordinate = 0
     y_coordinate = 0
 
-    location_list = []
-
     # lower speed value = faster
     spawn_speed = 4000
     spawn_speed_count = 0
@@ -32,6 +30,8 @@ class RedEnemy(Enemy):
         if Enemy.red_enemy_count == -1:
             Enemy.red_enemy_count += 1
             return
+        self.location_list = []
+
         self.x_coordinate = x_start
         self.y_coordinate = y_start
 
@@ -44,17 +44,20 @@ class RedEnemy(Enemy):
 
     def drawRedEnemy(self, game, color, erase_color):
         if len(self.location_list) >= self.length:
-            old_red_enemy = pygame.draw.circle(game, erase_color, self.location_list[len(self.location_list)-self.length], self.size)
+            old_red_enemy = pygame.gfxdraw.aacircle(game, (self.location_list[len(self.location_list)-self.length])[0], (self.location_list[len(self.location_list)-self.length])[1], self.size + 1, erase_color)
+            old_red_enemy = pygame.gfxdraw.filled_circle(game, (self.location_list[len(self.location_list)-self.length])[0], (self.location_list[len(self.location_list)-self.length])[1], self.size + 1, erase_color)
             self.location_list.remove(self.location_list[len(self.location_list)-self.length])
         for index in self.location_list:
-            red_enemy = pygame.draw.circle(game, color, index, self.size)
+            red_enemy = pygame.gfxdraw.aacircle(game, index[0], index[1], self.size, color)
 
         return
 
     def gotHit(self, game, erase_color):
         # prevent "x not in list" error
         for index in self.location_list:
-            old_red_enemy = pygame.draw.circle(game, erase_color, index, self.size)
+            # hit_old_red_enemy = pygame.gfxdraw.aacircle(game, (self.location_list[len(self.location_list)-self.length])[0], (self.location_list[len(self.location_list)-self.length])[1], self.size + 1, erase_color)
+            # hit_old_red_enemy = pygame.gfxdraw.filled_circle(game, (self.location_list[len(self.location_list)-self.length])[0], (self.location_list[len(self.location_list)-self.length])[1], self.size + 1, erase_color)
+            hit_red_enemy = pygame.gfxdraw.filled_circle(game, index[0], index[1], self.size + 1, erase_color)
         del self.location_list[:]
 
         if self in Enemy.enemy_list:

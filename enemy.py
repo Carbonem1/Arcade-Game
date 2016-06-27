@@ -5,10 +5,12 @@ class Enemy:
     blue_enemy_count = -1
     green_enemy_count = -1
     red_enemy_count = -1
+    purple_enemy_count = -1
     enemy_list = []
     blue_enemy_list = []
     green_enemy_list = []
     red_enemy_list = []
+    purple_enemy_list = []
 
     def __init__(self):
         if self.enemy_count == -1:
@@ -30,6 +32,9 @@ class Enemy:
 
     def getRedEnemyList(self):
         return self.red_enemy_list
+
+    def getPurpleEnemyList(self):
+        return self.purple_enemy_list
 
     def clearEnemyList(self):
         del self.enemy_list[:]

@@ -1,11 +1,9 @@
-#!/usr/bin/python
-
 # Thanks to MillionthVector for the sprites
+import os
 import pygame
 import sys
 from pygame.locals import *
 
-import math
 import random
 from random import randint
 
@@ -21,6 +19,7 @@ from enemy import Enemy
 from blue_enemy import BlueEnemy
 from green_enemy import GreenEnemy
 from red_enemy import RedEnemy
+from purple_enemy import PurpleEnemy
 
 def collisionDetection(game, erase_color, enemies, projectiles, character):
     for enemy in enemies:
@@ -30,10 +29,9 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
             if int(my_character.ship_rank) > 1:
                 my_character.ship_rank = str(int(my_character.ship_rank) - 1)
                 enemy.gotHit(game, erase_color)
-            #else:
-                #print "FINAL SCORE: ", statistics.total_kills
-                #pygame.quit()
-                #sys.exit()
+                return False
+            else:
+                return True
 
         # projectiles and enemies
         for projectile in projectiles:
@@ -76,6 +74,7 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = ( 0, 255, 0)
 BLUE = ( 0, 0, 255)
+PURPLE = (160, 32, 240)
 
 # set background color
 background_color = BLACK
@@ -92,11 +91,15 @@ enemy = Enemy()
 
 # blue enemy init
 blue_enemy = BlueEnemy(0, 0)
+
 # green enemy init
 green_enemy = GreenEnemy(0, 0)
 
 # red enemy init
 red_enemy = RedEnemy(0, 0)
+
+# red enemy init
+purple_enemy = PurpleEnemy(0, 0)
 
 mouse_x = 0
 mouse_y = 0
@@ -116,7 +119,7 @@ textRect = text.get_rect()
 space_ship = pygame.image.load("images/ships/blue/1/-north.png").convert_alpha()
 
 while True:
-    # draw the main menu
+    #draw the main menu
     # while True:
     #     for event in pygame.event.get():
     #         # quit on exit
@@ -129,6 +132,7 @@ while True:
     #             print x, y
     #             if blue_ship_button.collidepoint(x, y):
     #                 "BLUE"
+    #                 break
     #             if red_image_rect.collidepoint(x, y):
     #                 "RED"
     #             if purple_image_rect.collidepoint(x, y):
@@ -165,6 +169,9 @@ while True:
     #     silver_ship_button = DISPLAYSURF.blit(image, (silver_image_rect))
     #
     #     pygame.display.update()
+
+    # set the game_state
+    game_state = [my_character, proj.getProjectileList()]
 
     # draw the text's background rectangle onto the surface
     pygame.draw.rect(DISPLAYSURF, WHITE, (textRect.left, textRect.top, textRect.width, textRect.height))
@@ -256,6 +263,21 @@ while True:
         red_enemy.spawn_speed_count = 0
     red_enemy.spawn_speed_count += 1
 
+    # generate new purple enemies
+    if purple_enemy.spawn_speed_count == purple_enemy.spawn_speed:
+        # generate a random number based on difficulty
+        purples_generated = random.uniform(config.difficulty // 2.0, config.difficulty)
+        while purples_generated > 0:
+            # initialize each purple enemy in a random location
+            new_purple_x = randint(0, config.display_x)
+            new_purple_y = randint(0, config.display_y)
+            # if it is too close to the player, dont spawn
+            if not (abs(new_purple_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_purple_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
+                new_purple_enemy = PurpleEnemy(new_purple_x, new_purple_y)
+                purples_generated -= 1
+        purple_enemy.spawn_speed_count = 0
+    purple_enemy.spawn_speed_count += 1
+
     # draw in any blue enemies
     for enemy in blue_enemy.getBlueEnemyList():
         enemy.drawBlueEnemy(DISPLAYSURF, BLUE, background_color)
@@ -267,6 +289,10 @@ while True:
     # draw in any red enemies
     for enemy in red_enemy.getRedEnemyList():
         enemy.drawRedEnemy(DISPLAYSURF, RED, background_color)
+
+    # draw in any purple enemies
+    for enemy in purple_enemy.getPurpleEnemyList():
+        enemy.drawPurpleEnemy(DISPLAYSURF, PURPLE, background_color)
 
     # draw in any projectiles
     for projectile in proj.getProjectileList():
@@ -284,21 +310,36 @@ while True:
     for enemy in red_enemy.getRedEnemyList():
             enemy.move(my_character)
 
+    # set all purple enemies in motion
+    for enemy in purple_enemy.getPurpleEnemyList():
+            enemy.move(game_state)
+
     # set all projectiles in motion
     for projectile in proj.getProjectileList():
         if (-20 < projectile.x_coordinate < config.display_x + 20) and (-20 < projectile.y_coordinate < config.display_y + 20):
-                projectile.move(mouse_x, mouse_y)
+            projectile.move(mouse_x, mouse_y)
         else:
             projectile.remove(DISPLAYSURF, BLACK)
 
     # check for any collisions
-    collisionDetection(DISPLAYSURF, BLACK, enemy.getEnemyList(), proj.projectile_list, my_character)
+    if collisionDetection(DISPLAYSURF, BLACK, enemy.getEnemyList(), proj.projectile_list, my_character) == True:
+        print "FINAL SCORE: ", statistics.total_kills
+        print "Replay? (y/n)"
+        while True:
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_y:
+                        os.execl(sys.executable, sys.executable, *sys.argv)
+                    elif event.key == pygame.K_n:
+                        pygame.quit()
+                        sys.exit()
 
     # update statistics
     if statistics.shots_fired != 0:
         statistics.accuracy = statistics.shots_hit / statistics.shots_fired
 
     # slowly step the difficulty up
-    config.difficulty += .0001
+    config.difficulty += .00005
 
     pygame.display.update()

@@ -33,8 +33,12 @@ class GreenEnemy(Enemy):
 
     def drawGreenEnemy(self, game, color, erase_color):
         # erase our old character position and draw the new one
-        old_green_enemy = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
-        green_enemy = pygame.draw.circle(game, color, (self.x_coordinate, self.y_coordinate), self.size, 0)
+
+        old_green_enemy = pygame.gfxdraw.aacircle(game, self.old_x_coordinate, self.old_y_coordinate, self.size + 1, erase_color)
+        old_green_enemy = pygame.gfxdraw.filled_circle(game, self.old_x_coordinate, self.old_y_coordinate, self.size + 1, erase_color)
+
+        green_enemy = pygame.gfxdraw.aacircle(game, self.x_coordinate, self.y_coordinate, self.size, color)
+        #green_enemy = pygame.gfxdraw.filled_circle(game, self.x_coordinate, self.y_coordinate, self.size, color)
 
         # set old position to be current for next redraw
         self.old_x_coordinate = self.x_coordinate
@@ -43,8 +47,10 @@ class GreenEnemy(Enemy):
         return
 
     def gotHit(self, game, erase_color):
-        hit_old_green_enemy = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
-        hit_green_enemy = pygame.draw.circle(game, erase_color, (self.x_coordinate, self.y_coordinate), self.size, 0)
+        hit_old_green_enemy = pygame.gfxdraw.aacircle(game, self.old_x_coordinate, self.old_y_coordinate, self.size + 1, erase_color)
+        hit_old_green_enemy = pygame.gfxdraw.filled_circle(game, self.old_x_coordinate, self.old_y_coordinate, self.size + 1, erase_color)
+
+        hit_green_enemy = pygame.gfxdraw.aacircle(game, self.x_coordinate, self.y_coordinate, self.size, erase_color)
         # prevent "x not in list" error
         if self in Enemy.enemy_list:
             Enemy.enemy_list.remove(self)
