@@ -3,6 +3,7 @@ import os
 import pygame
 import sys
 from pygame.locals import *
+from option import Option
 
 import random
 from random import randint
@@ -20,6 +21,33 @@ from blue_enemy import BlueEnemy
 from green_enemy import GreenEnemy
 from red_enemy import RedEnemy
 from purple_enemy import PurpleEnemy
+
+def drawMenu(DISPLAYSURF):
+    for event in pygame.event.get():
+        print(event)
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+        for option in options:
+            if option.rect.collidepoint(pygame.mouse.get_pos()):
+                option.hovered = True
+                if event.type == MOUSEBUTTONUP:
+                    if option.text == "PLAY":
+                        DISPLAYSURF.fill((0,0,0))
+                        return False
+                    if option.text == "SETTINGS":
+                        DISPLAYSURF.fill((0,0,0))
+                        return False
+                    if option.text == "QUIT":
+                        pygame.quit()
+                        quit()
+            else:
+                option.hovered = False
+            option.draw()
+
+    pygame.display.update()
+    return True
 
 def collisionDetection(game, erase_color, enemies, projectiles, character):
     for enemy in enemies:
@@ -118,57 +146,16 @@ textRect = text.get_rect()
 #mousec = pygame.image.load(mouse_c).convert_alpha()
 space_ship = pygame.image.load("images/ships/blue/1/-north.png").convert_alpha()
 
+intro = True
+
+menu_font = pygame.font.Font(None, 40)
+options = [Option(DISPLAYSURF, BLUE, menu_font, "PLAY", (config.display_x // 2 - 40, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, menu_font, "SETTINGS", (config.display_x // 2 - 80, config.display_y // 2)),
+           Option(DISPLAYSURF, BLUE, menu_font, "QUIT", (config.display_x // 2 - 40, config.display_y // 2 + 100))]
+
 while True:
     #draw the main menu
-    # while True:
-    #     for event in pygame.event.get():
-    #         # quit on exit
-    #         if event.type == QUIT:
-    #             pygame.quit()
-    #             sys.exit()
-    #
-    #         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-    #             x, y = pygame.mouse.get_pos()
-    #             print x, y
-    #             if blue_ship_button.collidepoint(x, y):
-    #                 "BLUE"
-    #                 break
-    #             if red_image_rect.collidepoint(x, y):
-    #                 "RED"
-    #             if purple_image_rect.collidepoint(x, y):
-    #                 "PURPLE"
-    #             if silver_image_rect.collidepoint(x, y):
-    #                 "SILVER"
-    #
-    #     # display menu text
-    #     menuRect.centerx = DISPLAYSURF.get_rect().centerx
-    #     DISPLAYSURF.blit(menuText, menuRect)
-    #     pygame.display.flip()
-    #
-    #     # display ship icons
-    #     image = pygame.image.load("images/icon/blue_ship.png")
-    #     image_rect = image.get_rect()
-    #     x, y, width, height = image_rect
-    #     blue_image_rect = pygame.Rect(x, y + 100, width, height)
-    #     ship_rect = pygame.draw.rect(DISPLAYSURF, WHITE, blue_image_rect, 5)
-    #     blue_ship_button = DISPLAYSURF.blit(image, (blue_image_rect))
-    #
-    #     image = pygame.image.load("images/icon/red_ship.png")
-    #     red_image_rect = pygame.Rect(x + 200, y + 100, width, height)
-    #     ship_rect = pygame.draw.rect(DISPLAYSURF, WHITE, red_image_rect, 5)
-    #     red_ship_button = DISPLAYSURF.blit(image, (red_image_rect))
-    #
-    #     image = pygame.image.load("images/icon/purple_ship.png")
-    #     purple_image_rect = pygame.Rect(x + 400, y + 100, width, height)
-    #     ship_rect = pygame.draw.rect(DISPLAYSURF, WHITE, purple_image_rect, 5)
-    #     purple_ship_button = DISPLAYSURF.blit(image, (purple_image_rect))
-    #
-    #     image = pygame.image.load("images/icon/silver_ship.png")
-    #     silver_image_rect = pygame.Rect(x + 600, y + 100, width, height)
-    #     ship_rect = pygame.draw.rect(DISPLAYSURF, WHITE, silver_image_rect, 5)
-    #     silver_ship_button = DISPLAYSURF.blit(image, (silver_image_rect))
-    #
-    #     pygame.display.update()
+    while intro:
+        intro = drawMenu(DISPLAYSURF)
 
     # set the game_state
     game_state = [my_character, proj.getProjectileList()]
