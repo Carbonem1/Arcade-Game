@@ -2,70 +2,57 @@
 
 import pygame
 import sys
+import math
 from pygame.locals import *
 
 from projectile import Projectile
 
 class BasicProjectile(Projectile):
     size = 10
+    initial_x_coordinate = 0
+    initial_y_coordinate = 0
     x_coordinate = 0
     y_coordinate = 0
     old_x_coordinate = 0
     old_y_coordinate = 0
-    speed = 5
+    speed = 1
     speed_count = 0
-    direction = None
+    bullet_vector = 0
 
     def __init__(self, character):
         Projectile.__init__(self, self)
+        self.initial_x_coordinate = character.x_coordinate
+        self.initial_y_coordinate = character.y_coordinate
         self.x_coordinate = character.x_coordinate
         self.y_coordinate = character.y_coordinate
         self.old_x_coordinate = self.x_coordinate
         self.old_y_coordinate = self.y_coordinate
         self.direction = character.direction
         Projectile.projectile_count += 1
+        Projectile.basic_projectile_list.append(self)
 
     def drawProjectile(self, game, color, erase_color):
-        old_normal_projectile = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
-        normal_projectile = pygame.draw.circle(game, color, (self.x_coordinate, self.y_coordinate), self.size, 0)
+        old_normal_projectile = pygame.draw.circle(game, erase_color, (int(self.old_x_coordinate), int(self.old_y_coordinate)), self.size, 0)
+        normal_projectile = pygame.draw.circle(game, color, (int(self.x_coordinate), int(self.y_coordinate)), self.size, 0)
 
         self.old_x_coordinate = self.x_coordinate
         self.old_y_coordinate = self.y_coordinate
 
     def remove(self, game, erase_color):
-        remove_old_normal_projectile = pygame.draw.circle(game, erase_color, (self.old_x_coordinate, self.old_y_coordinate), self.size, 0)
-        remove_normal_projectile = pygame.draw.circle(game, erase_color, (self.x_coordinate, self.y_coordinate), self.size, 0)
+        remove_old_normal_projectile = pygame.draw.circle(game, erase_color, (int(self.old_x_coordinate), int(self.old_y_coordinate)), self.size, 0)
+        remove_normal_projectile = pygame.draw.circle(game, erase_color, (int(self.x_coordinate), int(self.y_coordinate)), self.size, 0)
         Projectile.projectile_list.remove(self)
 
     def move(self, mouse_x, mouse_y):
         if self.speed_count == self.speed:
-            if self.direction == "EAST":
-                self.x_coordinate += 1
+            if self.bullet_vector == 0:
+                distance = [mouse_x - self.initial_x_coordinate, mouse_y - self.initial_y_coordinate]
+                norm = math.sqrt(distance[0] ** 2 + distance[1] ** 2)
+                direction = [distance[0] / norm, distance[1] / norm]
+                self.bullet_vector = [direction[0], direction[1]]
 
-            if self.direction == "WEST":
-                self.x_coordinate -= 1
-
-            if self.direction == "SOUTH":
-                self.y_coordinate += 1
-
-            if self.direction == "NORTH":
-                self.y_coordinate -= 1
-
-            if self.direction == "SOUTHEAST":
-                self.x_coordinate += 1
-                self.y_coordinate += 1
-
-            if self.direction == "SOUTHWEST":
-                self.x_coordinate -= 1
-                self.y_coordinate += 1
-
-            if self.direction == "NORTHEAST":
-                self.x_coordinate += 1
-                self.y_coordinate -= 1
-
-            if self.direction == "NORTHWEST":
-                self.x_coordinate -= 1
-                self.y_coordinate -= 1
+            self.x_coordinate += self.bullet_vector[0]
+            self.y_coordinate += self.bullet_vector[1]
             self.speed_count = 0
 
         self.speed_count += 1

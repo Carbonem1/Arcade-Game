@@ -64,7 +64,7 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
         for projectile in projectiles:
             if abs(enemy.x_coordinate - projectile.x_coordinate) <= enemy.size and abs(enemy.y_coordinate - projectile.y_coordinate) <= enemy.size:
                 enemy.gotHit(game, erase_color)
-                if not projectile in projectile.getPiercingProjectileList():
+                if projectile in projectile.getProjectileList():
                     projectile.remove(game, erase_color)
                 statistics.total_kills += 1
                 statistics.shots_hit += 1
@@ -108,7 +108,7 @@ background_color = BLACK
 DISPLAYSURF.fill(background_color)
 
 # player init coordinates
-my_character = Character(config.display_x//2, config.display_y//2, "1", ("red", "1", ""))
+my_character = Character(config.display_x//2, config.display_y//2, "Basic", ("red", "1", ""))
 
 # player projectile
 proj = BasicProjectile(my_character)
@@ -125,7 +125,7 @@ green_enemy = GreenEnemy(0, 0)
 # red enemy init
 red_enemy = RedEnemy(0, 0)
 
-# red enemy init
+# purple enemy init
 purple_enemy = PurpleEnemy(0, 0)
 
 mouse_x = 0

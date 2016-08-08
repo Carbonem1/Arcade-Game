@@ -14,7 +14,7 @@ class Config:
 
     # set difficulty
     difficulty = 1
-    difficulty_scaler = .01
+    difficulty_scaler = .001
 
     # set enemy spawn buffer size
     spawn_buffer = 220

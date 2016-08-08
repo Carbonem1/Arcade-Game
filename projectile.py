@@ -3,6 +3,7 @@
 class Projectile:
     projectile_count = -1
     projectile_list = []
+    basic_projectile_list = []
     piercing_projectile_list = []
     laser_projectile_list = []
 

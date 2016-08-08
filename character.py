@@ -22,7 +22,7 @@ class Character():
     old_x_coordinate = 0
     old_y_coordinate = 0
 
-    current_projectile = None
+    current_projectile = "Basic"
 
     legal_moves = []
     direction = None
@@ -33,7 +33,7 @@ class Character():
     image = None
     image_rect = (0, 0)
 
-    def __init__(self, x_start, y_start, projectile = None, image = None):
+    def __init__(self, x_start, y_start, projectile, image = None):
         self.x_coordinate = x_start
         self.y_coordinate = y_start
         self.old_x_coordinate = x_start
@@ -47,11 +47,11 @@ class Character():
             self.image_rect = self.image.get_rect()
 
     def getProjectile(self):
-        if self.current_projectile == "0":
+        if self.current_projectile == "Basic":
             return BasicProjectile(self)
-        if self.current_projectile == "1":
+        if self.current_projectile == "Piercing":
             return PiercingProjectile(self)
-        if self.current_projectile == "2":
+        if self.current_projectile == "Laser":
             return LaserProjectile(self)
 
         else:
