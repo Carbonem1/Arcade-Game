@@ -14,7 +14,7 @@ from laser_projectile import LaserProjectile
 
 class Character():
     size = 40
-    speed = 3
+    speed = 1
     speed_count = 0
 
     x_coordinate = 0

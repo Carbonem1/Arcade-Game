@@ -15,7 +15,7 @@ class PiercingProjectile(Projectile):
     y_coordinate = 0
     old_x_coordinate = 0
     old_y_coordinate = 0
-    speed = 3
+    speed = 1
     speed_count = 0
     bullet_vector = 0
 

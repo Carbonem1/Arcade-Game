@@ -24,7 +24,6 @@ from purple_enemy import PurpleEnemy
 
 def drawMenu(DISPLAYSURF):
     for event in pygame.event.get():
-        print(event)
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
@@ -83,7 +82,7 @@ fpsClock.tick(config.FPS)
 
 # create the display surface
 DISPLAYSURF = pygame.display
-DISPLAYSURF = pygame.display.set_mode((config.display_x, config.display_y))#, pygame.FULLSCREEN)
+DISPLAYSURF = pygame.display.set_mode((config.display_x, config.display_y), pygame.FULLSCREEN)
 
 # set the game name
 pygame.display.set_caption(config.game_name)
@@ -223,7 +222,7 @@ while True:
     # generate new green enemies
     if green_enemy.spawn_speed_count == green_enemy.spawn_speed:
         # generate a random number based on difficulty
-        greens_generated = random.uniform(config.difficulty / 2.0, config.difficulty)
+        greens_generated = random.uniform(config.difficulty // 2.0, config.difficulty)
         while greens_generated > 0:
             # initialize each green enemy in a random location
             new_green_x = randint(0, config.display_x)
@@ -327,6 +326,6 @@ while True:
         statistics.accuracy = statistics.shots_hit / statistics.shots_fired
 
     # slowly step the difficulty up
-    config.difficulty += .00005
+    config.difficulty += config.difficulty_scaler
 
     pygame.display.update()

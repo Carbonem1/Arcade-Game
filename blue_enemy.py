@@ -15,7 +15,7 @@ class BlueEnemy(Enemy):
     old_y_coordinate = 0
     spawn_speed = 600
     spawn_speed_count = 0
-    speed = 20
+    speed = 12
     speed_count = 0
 
     def __init__(self, x_start, y_start):

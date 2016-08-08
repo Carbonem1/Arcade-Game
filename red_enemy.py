@@ -22,7 +22,7 @@ class RedEnemy(Enemy):
     # lower speed value = faster
     spawn_speed = 4000
     spawn_speed_count = 0
-    speed = 8
+    speed = 4
     speed_count = 0
 
     def __init__(self, x_start, y_start):
