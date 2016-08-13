@@ -6,7 +6,7 @@ from pygame.locals import *
 
 from enemy import Enemy
 
-class GreenEnemy(Enemy):
+class GreenEnemy(object, Enemy):
     size = 10
     x_coordinate = 0
     y_coordinate = 0

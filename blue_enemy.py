@@ -8,7 +8,7 @@ from pygame import gfxdraw
 
 from enemy import Enemy
 
-class BlueEnemy(Enemy):
+class BlueEnemy(object, Enemy):
     size = 20
     x_coordinate = 0
     y_coordinate = 0

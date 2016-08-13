@@ -2,6 +2,7 @@
 import os
 import pygame
 import sys
+import ctypes
 from pygame.locals import *
 from option import Option
 
@@ -22,13 +23,13 @@ from green_enemy import GreenEnemy
 from red_enemy import RedEnemy
 from purple_enemy import PurpleEnemy
 
-def drawMenu(DISPLAYSURF):
+def drawMainMenu(DISPLAYSURF):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
 
-        for option in options:
+        for option in mainMenuOptions:
             if option.rect.collidepoint(pygame.mouse.get_pos()):
                 option.hovered = True
                 if event.type == MOUSEBUTTONUP:
@@ -40,7 +41,7 @@ def drawMenu(DISPLAYSURF):
                         return False
                     if option.text == "QUIT":
                         pygame.quit()
-                        quit()
+                        sys.exit()
             else:
                 option.hovered = False
             option.draw()
@@ -48,11 +49,80 @@ def drawMenu(DISPLAYSURF):
     pygame.display.update()
     return True
 
+def drawPlayAgainMenu(DISPLAYSURF):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+        for option in playAgainMenuOptions:
+            if option.rect.collidepoint(pygame.mouse.get_pos()):
+                option.hovered = True
+                if event.type == MOUSEBUTTONUP:
+                    if option.text == "YES":
+                        os.execl(sys.executable, sys.executable, *sys.argv)
+                        return False
+                    if option.text == "NO":
+                        pygame.quit()
+                        sys.exit()
+            else:
+                option.hovered = False
+            option.draw()
+
+    pygame.display.update()
+    return True
+
+def drawStatsMenu(DISPLAYSURF):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+    center = config.display_y // 2
+    
+    killsText = font.render("Kills: " + str(statistics.total_kills), True, WHITE, BLACK)
+    killsRect = (100, center - 200)
+    DISPLAYSURF.blit(killsText, killsRect)
+
+    deathsText = font.render("Deaths: " + str(statistics.total_deaths), True, WHITE, BLACK)
+    deathsRect = (100, center - 150)
+    DISPLAYSURF.blit(deathsText, deathsRect)
+
+    blueKillsText = font.render("Blue Kills: " + str(statistics.blue_kills), True, WHITE, BLACK)
+    blueKillsRect = (100, center - 100)
+    DISPLAYSURF.blit(blueKillsText, blueKillsRect)
+
+    greenKillsText = font.render("Green Kills: " + str(statistics.green_kills), True, WHITE, BLACK)
+    greenKillsRect = (100, center - 50)
+    DISPLAYSURF.blit(greenKillsText, greenKillsRect)
+
+    redKillsText = font.render("Red Kills: " + str(statistics.red_kills), True, WHITE, BLACK)
+    redKillsRect = (100, center)
+    DISPLAYSURF.blit(redKillsText, redKillsRect)
+
+    purpleKillsText = font.render("Purple Kills: " + str(statistics.purple_kills), True, WHITE, BLACK)
+    purpleKillsRect = (100, center + 50)
+    DISPLAYSURF.blit(purpleKillsText, purpleKillsRect)
+
+    shotsFiredText = font.render("Shots Fired: " + str(int(statistics.shots_fired)), True, WHITE, BLACK)
+    shotsFiredRect = (100, center + 100)
+    DISPLAYSURF.blit(shotsFiredText, shotsFiredRect)
+
+    shotsHitText = font.render("Shots Hit: " + str(int(statistics.shots_hit)), True, WHITE, BLACK)
+    shotsHitRect = (100, center + 150)
+    DISPLAYSURF.blit(shotsHitText, shotsHitRect)
+
+    accuracyText = font.render("Accuracy: " + str(statistics.accuracy), True, WHITE, BLACK)
+    accuracyRect = (100, center + 200)
+    DISPLAYSURF.blit(accuracyText, accuracyRect)
+    
+    pygame.display.update()
+
 def collisionDetection(game, erase_color, enemies, projectiles, character):
     for enemy in enemies:
         # player and enemies
         if abs(enemy.x_coordinate - character.x_coordinate) <= character.size and abs(enemy.y_coordinate - character.y_coordinate) <= character.size:
-            statistics.deaths += 1
+            statistics.total_deaths += 1
             if int(my_character.ship_rank) > 1:
                 my_character.ship_rank = str(int(my_character.ship_rank) - 1)
                 enemy.gotHit(game, erase_color)
@@ -66,10 +136,20 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
                 enemy.gotHit(game, erase_color)
                 if projectile in projectile.getProjectileList():
                     projectile.remove(game, erase_color)
+                # update statistics
                 statistics.total_kills += 1
                 statistics.shots_hit += 1
+                if type(enemy) is BlueEnemy:
+                    statistics.blue_kills += 1
+                if type(enemy) is GreenEnemy:
+                    statistics.green_kills += 1
+                if type(enemy) is RedEnemy:
+                    statistics.red_kills += 1
+                if type(enemy) is PurpleEnemy:
+                    statistics.purple_kills += 1
+                
                 # upgrade ship
-                if statistics.total_kills % 10 == 0 and int(my_character.ship_rank) < 4:
+                if statistics.total_kills % 50 == 0 and int(my_character.ship_rank) < 4:
                     my_character.ship_rank = str(int(my_character.ship_rank) + 1)
 
 pygame.init()
@@ -79,6 +159,11 @@ statistics = Statistics()
 
 fpsClock = pygame.time.Clock()
 fpsClock.tick(config.FPS)
+
+user32 = ctypes.windll.user32
+screenSize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+config.display_x = screenSize[0]
+config.display_y = screenSize[1]
 
 # create the display surface
 DISPLAYSURF = pygame.display
@@ -128,43 +213,67 @@ red_enemy = RedEnemy(0, 0)
 # purple enemy init
 purple_enemy = PurpleEnemy(0, 0)
 
+# initialize mouse position
 mouse_x = 0
 mouse_y = 0
 
-# set up fonts
-basicFont = pygame.font.SysFont(None, 30)
-# set up the text for the menu
-menuText = basicFont.render("Welcome to " + config.game_name + "! Pick a ship.", True, WHITE, BLACK)
-menuRect = menuText.get_rect()
-
-# set up the text for score
-text = basicFont.render("Score: ", True, WHITE, BLACK)
-textRect = text.get_rect()
 
 # attempt ship rotate to cursor
-#mousec = pygame.image.load(mouse_c).convert_alpha()
 space_ship = pygame.image.load("images/ships/blue/1/-north.png").convert_alpha()
 
+# set menu booleans
 intro = True
+playAgainMenu = True
 
-menu_font = pygame.font.Font(None, 40)
-options = [Option(DISPLAYSURF, BLUE, menu_font, "PLAY", (config.display_x // 2 - 40, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, menu_font, "SETTINGS", (config.display_x // 2 - 80, config.display_y // 2)),
-           Option(DISPLAYSURF, BLUE, menu_font, "QUIT", (config.display_x // 2 - 40, config.display_y // 2 + 100))]
+# set font
+font = pygame.font.Font(None, 40)
+
+# set up the text for score
+scoreText = font.render("Score: ", True, WHITE, BLACK)
+textRect = scoreText.get_rect()
+
+# set up the text for stats
+killsText = font.render("Kills: ", True, WHITE, BLACK)
+killsRect = killsText.get_rect()
+
+deathsText = font.render("Deaths: ", True, WHITE, BLACK)
+deathsRect = deathsText.get_rect()
+
+blueKillsText = font.render("Blue Kills: ", True, WHITE, BLACK)
+blueKillsRect = blueKillsText.get_rect()
+
+greenKillsText = font.render("Green Kills: ", True, WHITE, BLACK)
+greenKillsRect = greenKillsText.get_rect()
+
+redKillsText = font.render("Red Kills: ", True, WHITE, BLACK)
+redKillsRect = redKillsText.get_rect()
+
+purpleKillsText = font.render("Purple Kills: ", True, WHITE, BLACK)
+purpleKillsRect = purpleKillsText.get_rect()
+
+shotsFiredText = font.render("Shots Fired: ", True, WHITE, BLACK)
+shotsFiredRect = shotsFiredText.get_rect()
+
+shotsHitText = font.render("Shots Hit: ", True, WHITE, BLACK)
+shotsHitRect = shotsHitText.get_rect()
+
+accuracyText = font.render("Accuracy: ", True, WHITE, BLACK)
+accuracyRect = accuracyText.get_rect()
+
+# set main menu options
+mainMenuOptions = [Option(DISPLAYSURF, BLUE, font, "PLAY", (config.display_x // 2 - 40, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, font, "SETTINGS", (config.display_x // 2 - 80, config.display_y // 2)),
+           Option(DISPLAYSURF, BLUE, font, "QUIT", (config.display_x // 2 - 40, config.display_y // 2 + 100))]
 
 while True:
     #draw the main menu
     while intro:
-        intro = drawMenu(DISPLAYSURF)
+        intro = drawMainMenu(DISPLAYSURF)
 
     # set the game_state
     game_state = [my_character, proj.getProjectileList()]
 
     # draw the text's background rectangle onto the surface
     pygame.draw.rect(DISPLAYSURF, WHITE, (textRect.left, textRect.top, textRect.width, textRect.height))
-
-    # draw the text onto the surface
-    text = basicFont.render("Score: " + str(statistics.total_kills), True, WHITE, BLACK)
-    DISPLAYSURF.blit(text, textRect)
 
     for event in pygame.event.get():
         if event.type == MOUSEMOTION:
@@ -309,23 +418,25 @@ while True:
 
     # check for any collisions
     if collisionDetection(DISPLAYSURF, BLACK, enemy.getEnemyList(), proj.projectile_list, my_character) == True:
-        print "FINAL SCORE: ", statistics.total_kills
-        print "Replay? (y/n)"
-        while True:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_y:
-                        os.execl(sys.executable, sys.executable, *sys.argv)
-                    elif event.key == pygame.K_n:
-                        pygame.quit()
-                        sys.exit()
+        # clear the display and show the play again menu
+        DISPLAYSURF.fill((0,0,0))
+        playAgainMenuOptions = [Option(DISPLAYSURF, WHITE, font, "PLAY AGAIN?", (config.display_x // 2 - 100, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, font, "YES", (config.display_x // 2 - 30, config.display_y // 2)),
+           Option(DISPLAYSURF, BLUE, font, "NO", (config.display_x // 2 - 20, config.display_y // 2 + 100))]
+        while(playAgainMenu):
+            playAgainMenu = drawPlayAgainMenu(DISPLAYSURF)
+            drawStatsMenu(DISPLAYSURF)
 
     # update statistics
     if statistics.shots_fired != 0:
         statistics.accuracy = statistics.shots_hit / statistics.shots_fired
+        statistics.accuracy = round(statistics.accuracy, 2)
 
     # slowly step the difficulty up
     config.difficulty += config.difficulty_scaler
+
+    # draw the score onto the surface
+    scoreText = font.render("Score: " + str(statistics.total_kills), True, WHITE, BLACK)
+    textRect = scoreText.get_rect()
+    DISPLAYSURF.blit(scoreText, textRect)
 
     pygame.display.update()

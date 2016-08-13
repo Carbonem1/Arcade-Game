@@ -8,7 +8,7 @@ from enemy import Enemy
 
 from random import randint
 
-class PurpleEnemy(Enemy):
+class PurpleEnemy(object, Enemy):
     size = 30
     x_coordinate = 0
     y_coordinate = 0

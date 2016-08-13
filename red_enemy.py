@@ -8,7 +8,7 @@ from random import randint
 
 from enemy import Enemy
 
-class RedEnemy(Enemy):
+class RedEnemy(object, Enemy):
     size = 6
     length = 150
 
