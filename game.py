@@ -32,7 +32,11 @@ def drawMainMenu(DISPLAYSURF):
         for option in mainMenuOptions:
             if option.rect.collidepoint(pygame.mouse.get_pos()):
                 option.hovered = True
+                #sound_hover_menu_item.play()
                 if event.type == MOUSEBUTTONUP:
+                    # play sound
+                    sound_select_menu_item.play()
+                    
                     if option.text == "PLAY":
                         DISPLAYSURF.fill((0,0,0))
                         return False
@@ -58,7 +62,11 @@ def drawPlayAgainMenu(DISPLAYSURF):
         for option in playAgainMenuOptions:
             if option.rect.collidepoint(pygame.mouse.get_pos()):
                 option.hovered = True
+                #sound_hover_menu_item.play()
                 if event.type == MOUSEBUTTONUP:
+                    # play sound
+                    sound_select_menu_item.play()
+                    
                     if option.text == "YES":
                         os.execl(sys.executable, sys.executable, *sys.argv)
                         return False
@@ -122,7 +130,13 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
     for enemy in enemies:
         # player and enemies
         if abs(enemy.x_coordinate - character.x_coordinate) <= character.size and abs(enemy.y_coordinate - character.y_coordinate) <= character.size:
+
+            # play sound
+            sound_death.play()
+
+            # update stats
             statistics.total_deaths += 1
+            
             if int(my_character.ship_rank) > 1:
                 my_character.ship_rank = str(int(my_character.ship_rank) - 1)
                 enemy.gotHit(game, erase_color)
@@ -134,6 +148,10 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
         for projectile in projectiles:
             if abs(enemy.x_coordinate - projectile.x_coordinate) <= enemy.size and abs(enemy.y_coordinate - projectile.y_coordinate) <= enemy.size:
                 enemy.gotHit(game, erase_color)
+
+                # play sound
+                sound_enemy_hit.play()
+                
                 if projectile in projectile.getProjectileList():
                     projectile.remove(game, erase_color)
                 # update statistics
@@ -151,6 +169,9 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
                 # upgrade ship
                 if statistics.total_kills % 50 == 0 and int(my_character.ship_rank) < 4:
                     my_character.ship_rank = str(int(my_character.ship_rank) + 1)
+
+                    # play sound
+                    sound_ship_upgrade.play()
 
 pygame.init()
 
@@ -264,6 +285,19 @@ accuracyRect = accuracyText.get_rect()
 mainMenuOptions = [Option(DISPLAYSURF, BLUE, font, "PLAY", (config.display_x // 2 - 40, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, font, "SETTINGS", (config.display_x // 2 - 80, config.display_y // 2)),
            Option(DISPLAYSURF, BLUE, font, "QUIT", (config.display_x // 2 - 40, config.display_y // 2 + 100))]
 
+# set up sounds
+pygame.mixer.init(frequency=22050, size=-16, channels=8, buffer=4096)
+
+pygame.mixer.music.load("audio/background_music.wav")
+pygame.mixer.music.play(-1)
+
+sound_select_menu_item = pygame.mixer.Sound("audio/select_menu_item.wav")
+sound_hover_menu_item = pygame.mixer.Sound("audio/hover_menu_item.wav")
+sound_shoot = pygame.mixer.Sound("audio/laser_shot.wav")
+sound_enemy_hit = pygame.mixer.Sound("audio/enemy_hit.wav")
+sound_death = pygame.mixer.Sound("audio/death.wav")
+sound_ship_upgrade = pygame.mixer.Sound("audio/ship_upgrade.wav")
+
 while True:
     #draw the main menu
     while intro:
@@ -283,6 +317,11 @@ while True:
         if event.type == MOUSEBUTTONUP:
             mouse_x, mouse_y = event.pos
             my_character.shoot(DISPLAYSURF, WHITE, BLACK, my_character, mouse_x, mouse_y)
+
+            # play sound
+            sound_shoot.play()
+
+            # update stats
             statistics.shots_fired += 1
 
         # quit on exit
