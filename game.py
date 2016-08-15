@@ -47,63 +47,75 @@ def insertPlayerRecord(name, total_kills, total_deaths, blue_kills, green_kills,
     connection.close()
 
 def drawMainMenu(DISPLAYSURF):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-
+    DISPLAYSURF.fill((0,0,0))
+    while(True):
         for option in mainMenuOptions:
-            if option.rect.collidepoint(pygame.mouse.get_pos()):
-                option.hovered = True
-                #sound_hover_menu_item.play()
-                if event.type == MOUSEBUTTONUP:
-                    # play sound
-                    sound_select_menu_item.play()
-
-                    if option.text == "PLAY":
-                        DISPLAYSURF.fill((0,0,0))
-                        return False
-                    if option.text == "SETTINGS":
-                        DISPLAYSURF.fill((0,0,0))
-                    if option.text == "LEADERBOARD":
-                        DISPLAYSURF.fill((0,0,0))
-                        drawLeaderboardMenu(DISPLAYSURF)
-                        return False
-                    if option.text == "QUIT":
-                        pygame.quit()
-                        sys.exit()
-            else:
-                option.hovered = False
             option.draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
-    pygame.display.update()
+            for option in mainMenuOptions:
+                if option.rect.collidepoint(pygame.mouse.get_pos()):
+                    option.hovered = True
+                    #sound_hover_menu_item.play()
+                    if event.type == MOUSEBUTTONUP:
+                        # play sound
+                        sound_select_menu_item.play()
+
+                        if option.text == "PLAY":
+                            DISPLAYSURF.fill((0,0,0))
+                            option.hovered = False
+                            return False
+                        if option.text == "SETTINGS":
+                            option.hovered = False
+                            DISPLAYSURF.fill((0,0,0))
+                        if option.text == "LEADERBOARD":
+                            option.hovered = False
+                            drawLeaderboardMenu(DISPLAYSURF)
+                        if option.text == "QUIT":
+                            pygame.quit()
+                            sys.exit()
+                else:
+                    option.hovered = False
+
+        pygame.display.update()
     return True
 
 def drawPlayAgainMenu(DISPLAYSURF):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-
+    play_again_option = Option(DISPLAYSURF, WHITE, font, "PLAY AGAIN?", (config.display_x // 2 - 100, config.display_y // 2 - 100))
+    while (True):
+        play_again_option.draw()
         for option in playAgainMenuOptions:
-            if option.rect.collidepoint(pygame.mouse.get_pos()):
-                option.hovered = True
-                #sound_hover_menu_item.play()
-                if event.type == MOUSEBUTTONUP:
-                    # play sound
-                    sound_select_menu_item.play()
-
-                    if option.text == "YES":
-                        os.execl(sys.executable, sys.executable, *sys.argv)
-                        return False
-                    if option.text == "NO":
-                        pygame.quit()
-                        sys.exit()
-            else:
-                option.hovered = False
             option.draw()
+        drawStatsMenu(DISPLAYSURF)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
-    pygame.display.update()
+            for option in playAgainMenuOptions:
+                if option.rect.collidepoint(pygame.mouse.get_pos()):
+                    option.hovered = True
+                    #sound_hover_menu_item.play()
+                    if event.type == MOUSEBUTTONUP:
+                        # play sound
+                        sound_select_menu_item.play()
+    
+                        if option.text == "YES":
+                            os.execl(sys.executable, sys.executable, *sys.argv)
+                            return False
+                        if option.text == "NO":
+                            pygame.quit()
+                            sys.exit()
+                        if option.text == "MAIN MENU":
+                            drawMainMenu(DISPLAYSURF)
+                        option.hovered = False
+                else:
+                    option.hovered = False
+                
+        pygame.display.update()
     return True
 
 def drawStatsMenu(DISPLAYSURF):
@@ -154,6 +166,7 @@ def drawStatsMenu(DISPLAYSURF):
     pygame.display.update()
 
 def drawLeaderboardMenu(DISPLAYSURF):
+    DISPLAYSURF.fill((0,0,0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -170,19 +183,31 @@ def drawLeaderboardMenu(DISPLAYSURF):
 
     x_spacing = 250
     y_spacing = 0
-
+        
     for (name, score) in cursor:
         name_option = Option(DISPLAYSURF, BLUE, font, "Name: " + str(name), (config.display_x // 2 - config.display_x // 4, (config.display_y // 5 + y_spacing)))
-        print len(str(name))
-        print len(str("Name: "))
         score_option = Option(DISPLAYSURF, BLUE, font, "Score: " + str(score), (config.display_x // 2 + config.display_x // 10, (config.display_y // 5 + y_spacing)))
         name_option.draw()
         score_option.draw()
         y_spacing += 50
-
+        
+    back_option = Option(DISPLAYSURF, BLUE, font, "BACK", (config.display_x // 2 - len("BACK") * 10, (config.display_y - 100)))
     while(True):
+        for event in pygame.event.get():
+            if back_option.rect.collidepoint(pygame.mouse.get_pos()):
+                back_option.hovered = True
+                #sound_hover_menu_item.play()
+                if event.type == MOUSEBUTTONUP:
+                    # play sound
+                    sound_select_menu_item.play()
+                    cursor.close()
+                    connection.close()
+                    drawMainMenu(DISPLAYSURF)
+                    return
+            else:
+                back_option.hovered = False
         pygame.display.update()
-                            
+        back_option.draw()
     cursor.close()
     connection.close()
     
@@ -559,11 +584,10 @@ while True:
 
         # clear the display and show the play again menu
         DISPLAYSURF.fill((0,0,0))
-        playAgainMenuOptions = [Option(DISPLAYSURF, WHITE, font, "PLAY AGAIN?", (config.display_x // 2 - 100, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, font, "YES", (config.display_x // 2 - 30, config.display_y // 2)),
-           Option(DISPLAYSURF, BLUE, font, "NO", (config.display_x // 2 - 20, config.display_y // 2 + 100))]
+        playAgainMenuOptions = [Option(DISPLAYSURF, BLUE, font, "YES", (config.display_x // 2 - 30, config.display_y // 2)),
+           Option(DISPLAYSURF, BLUE, font, "NO", (config.display_x // 2 - 20, config.display_y // 2 + 100)), Option(DISPLAYSURF, BLUE, font, "MAIN MENU", (config.display_x // 2 - len("MAIN MENU") * 10, config.display_y - 100))]
         while(playAgainMenu):
             playAgainMenu = drawPlayAgainMenu(DISPLAYSURF)
-            drawStatsMenu(DISPLAYSURF)
 
     # update statistics
     if statistics.shots_fired != 0:
