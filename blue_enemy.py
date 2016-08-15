@@ -14,9 +14,9 @@ class BlueEnemy(object, Enemy):
     y_coordinate = 0
     old_x_coordinate = 0
     old_y_coordinate = 0
-    spawn_speed = 600
+    spawn_speed = 400
     spawn_speed_count = 0
-    speed = 6
+    speed = 5
     speed_count = 0
     movement_vector = 0
 

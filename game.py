@@ -1,18 +1,21 @@
 # Thanks to MillionthVector for the sprites
 import os
+import random
 import pygame
 import sys
 import ctypes
+import mysql.connector
 from pygame.locals import *
+
 from option import Option
 
-import random
 from random import randint
 
 from config import Config
 from statistics import Statistics
 
 from character import Character
+
 from projectile import Projectile
 from basic_projectile import BasicProjectile
 from piercing_projectile import PiercingProjectile
@@ -22,6 +25,26 @@ from blue_enemy import BlueEnemy
 from green_enemy import GreenEnemy
 from red_enemy import RedEnemy
 from purple_enemy import PurpleEnemy
+
+# insert high score record
+def insertPlayerRecord(name, total_kills, total_deaths, blue_kills, green_kills, red_kills, purple_kills, shots_fired, shots_hit, accuracy):
+    # establish connection to the server
+    connection = mysql.connector.connect(user = config.USER, password = config.PASSWORD, host = config.HOST, database = config.DATABASE)
+
+    cursor = connection.cursor(buffered = True)
+
+    # insert player with name, and score
+    addPlayer = ("INSERT INTO high_scores "
+           "(name, total_kills, total_deaths, blue_kills, green_kills, red_kills, purple_kills, shots_fired, shots_hit, accuracy)"
+           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    dataPlayer = (name, total_kills, total_deaths, blue_kills, green_kills, red_kills, purple_kills, shots_fired, shots_hit, accuracy)
+
+    cursor.execute(addPlayer, dataPlayer)
+    connection.commit()
+
+    # close the connection to the database
+    cursor.close()
+    connection.close()
 
 def drawMainMenu(DISPLAYSURF):
     for event in pygame.event.get():
@@ -36,7 +59,7 @@ def drawMainMenu(DISPLAYSURF):
                 if event.type == MOUSEBUTTONUP:
                     # play sound
                     sound_select_menu_item.play()
-                    
+
                     if option.text == "PLAY":
                         DISPLAYSURF.fill((0,0,0))
                         return False
@@ -66,7 +89,7 @@ def drawPlayAgainMenu(DISPLAYSURF):
                 if event.type == MOUSEBUTTONUP:
                     # play sound
                     sound_select_menu_item.play()
-                    
+
                     if option.text == "YES":
                         os.execl(sys.executable, sys.executable, *sys.argv)
                         return False
@@ -86,8 +109,9 @@ def drawStatsMenu(DISPLAYSURF):
             pygame.quit()
             quit()
 
+    # center the text
     center = config.display_y // 2
-    
+
     killsText = font.render("Kills: " + str(statistics.total_kills), True, WHITE, BLACK)
     killsRect = (100, center - 200)
     DISPLAYSURF.blit(killsText, killsRect)
@@ -123,7 +147,7 @@ def drawStatsMenu(DISPLAYSURF):
     accuracyText = font.render("Accuracy: " + str(statistics.accuracy), True, WHITE, BLACK)
     accuracyRect = (100, center + 200)
     DISPLAYSURF.blit(accuracyText, accuracyRect)
-    
+
     pygame.display.update()
 
 def collisionDetection(game, erase_color, enemies, projectiles, character):
@@ -136,7 +160,7 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
 
             # update stats
             statistics.total_deaths += 1
-            
+
             if int(my_character.ship_rank) > 1:
                 my_character.ship_rank = str(int(my_character.ship_rank) - 1)
                 enemy.gotHit(game, erase_color)
@@ -151,7 +175,7 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
 
                 # play sound
                 sound_enemy_hit.play()
-                
+
                 if projectile in projectile.getProjectileList():
                     projectile.remove(game, erase_color)
                 # update statistics
@@ -165,13 +189,43 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
                     statistics.red_kills += 1
                 if type(enemy) is PurpleEnemy:
                     statistics.purple_kills += 1
-                
+
                 # upgrade ship
                 if statistics.total_kills % 50 == 0 and int(my_character.ship_rank) < 4:
                     my_character.ship_rank = str(int(my_character.ship_rank) + 1)
 
                     # play sound
                     sound_ship_upgrade.play()
+
+# events
+def eventBlueCorner():
+    # generate random corner
+    corner = randint(1, 4)
+    # generate a random number based on difficulty
+    blues_generated = random.uniform(config.difficulty, config.difficulty * 2)
+    while blues_generated > 0:
+        # initialize each blue enemy in a random location based on corner
+        # top left
+        if corner == 1:
+            new_blue_x = randint(0, 100)
+            new_blue_y = randint(0, 100)
+        # top right
+        if corner == 2:
+            new_blue_x = randint(config.display_x - 100, config.display_x)
+            new_blue_y = randint(0, 100)
+        # bottom left
+        if corner == 3:
+            new_blue_x = randint(0, 100)
+            new_blue_y = randint(config.display_y - 100, config.display_y)
+        if corner == 4:
+        # bottom right
+            new_blue_x = randint(config.display_x - 100, config.display_x)
+            new_blue_y = randint(config.display_y - 100, config.display_y)
+
+        new_blue_enemy = BlueEnemy(new_blue_x, new_blue_y)
+        blues_generated -= 1
+
+
 
 pygame.init()
 
@@ -355,7 +409,7 @@ while True:
     # generate new blue enemies
     if blue_enemy.spawn_speed_count == blue_enemy.spawn_speed:
         # generate a random number based on difficulty
-        blues_generated = random.uniform(config.difficulty // 2.0, config.difficulty)
+        blues_generated = random.uniform(config.difficulty, config.difficulty + 1)
         while blues_generated > 0:
             # initialize each blue enemy in a random location
             new_blue_x = randint(0, config.display_x)
@@ -370,7 +424,7 @@ while True:
     # generate new green enemies
     if green_enemy.spawn_speed_count == green_enemy.spawn_speed:
         # generate a random number based on difficulty
-        greens_generated = random.uniform(config.difficulty // 2.0, config.difficulty)
+        greens_generated = random.uniform(config.difficulty, config.difficulty + 1)
         while greens_generated > 0:
             # initialize each green enemy in a random location
             new_green_x = randint(0, config.display_x)
@@ -400,7 +454,7 @@ while True:
     # generate new purple enemies
     if purple_enemy.spawn_speed_count == purple_enemy.spawn_speed:
         # generate a random number based on difficulty
-        purples_generated = random.uniform(config.difficulty // 2.0, config.difficulty)
+        purples_generated = random.uniform(config.difficulty, config.difficulty + 1)
         while purples_generated > 0:
             # initialize each purple enemy in a random location
             new_purple_x = randint(0, config.display_x)
@@ -411,6 +465,13 @@ while True:
                 purples_generated -= 1
         purple_enemy.spawn_speed_count = 0
     purple_enemy.spawn_speed_count += 1
+
+    # generate new events
+    if config.event_spawn_speed_count == config.event_spawn_speed:
+        eventBlueCorner()
+        config.event_spawn_speed_count = 0
+    else:
+        config.event_spawn_speed_count += 1
 
     # draw in any blue enemies
     for enemy in blue_enemy.getBlueEnemyList():
@@ -457,6 +518,9 @@ while True:
 
     # check for any collisions
     if collisionDetection(DISPLAYSURF, BLACK, enemy.getEnemyList(), proj.projectile_list, my_character) == True:
+        # add player to the database
+        insertPlayerRecord(statistics.name, statistics.total_kills, statistics.total_deaths, statistics.blue_kills, statistics.green_kills, statistics.red_kills, statistics.purple_kills, statistics.shots_fired, statistics.shots_hit, statistics.accuracy)
+
         # clear the display and show the play again menu
         DISPLAYSURF.fill((0,0,0))
         playAgainMenuOptions = [Option(DISPLAYSURF, WHITE, font, "PLAY AGAIN?", (config.display_x // 2 - 100, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, font, "YES", (config.display_x // 2 - 30, config.display_y // 2)),

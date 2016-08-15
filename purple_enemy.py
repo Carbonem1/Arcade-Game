@@ -14,9 +14,9 @@ class PurpleEnemy(object, Enemy):
     y_coordinate = 0
     old_x_coordinate = 0
     old_y_coordinate = 0
-    spawn_speed = 1200
+    spawn_speed = 900
     spawn_speed_count = 0
-    speed = 40
+    speed = 20
     speed_count = 0
     dodge_speed = 2
     dodge_speed_count = 0

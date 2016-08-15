@@ -20,9 +20,9 @@ class RedEnemy(object, Enemy):
     y_coordinate = 0
 
     # lower speed value = faster
-    spawn_speed = 4000
+    spawn_speed = 3000
     spawn_speed_count = 0
-    speed = 4
+    speed = 3
     speed_count = 0
 
     def __init__(self, x_start, y_start):

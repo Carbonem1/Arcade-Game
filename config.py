@@ -13,8 +13,18 @@ class Config:
     display_y = 1080
 
     # set difficulty
-    difficulty = 1
+    difficulty = 0
     difficulty_scaler = .001
 
     # set enemy spawn buffer size
     spawn_buffer = 220
+
+    # set event frequency
+    event_spawn_speed = 5000
+    event_spawn_speed_count = 0
+
+    # database setup
+    USER = 'root'
+    PASSWORD = 'ArcadeGame2016!'
+    HOST = '10.0.2.20'
+    DATABASE = 'slyc'
