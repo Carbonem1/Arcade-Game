@@ -65,6 +65,9 @@ def drawMainMenu(DISPLAYSURF):
                         return False
                     if option.text == "SETTINGS":
                         DISPLAYSURF.fill((0,0,0))
+                    if option.text == "LEADERBOARD":
+                        DISPLAYSURF.fill((0,0,0))
+                        drawLeaderboardMenu(DISPLAYSURF)
                         return False
                     if option.text == "QUIT":
                         pygame.quit()
@@ -150,6 +153,39 @@ def drawStatsMenu(DISPLAYSURF):
 
     pygame.display.update()
 
+def drawLeaderboardMenu(DISPLAYSURF):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+    connection = mysql.connector.connect(user = config.USER, password = config.PASSWORD, host = config.HOST, database = config.DATABASE)
+    cursor = connection.cursor()
+
+    query = ("SELECT name, total_kills FROM high_scores "
+         "ORDER BY total_kills DESC "
+         "LIMIT 10")
+
+    cursor.execute(query)
+
+    x_spacing = 250
+    y_spacing = 0
+
+    for (name, score) in cursor:
+        name_option = Option(DISPLAYSURF, BLUE, font, "Name: " + str(name), (config.display_x // 2 - config.display_x // 4, (config.display_y // 5 + y_spacing)))
+        print len(str(name))
+        print len(str("Name: "))
+        score_option = Option(DISPLAYSURF, BLUE, font, "Score: " + str(score), (config.display_x // 2 + config.display_x // 10, (config.display_y // 5 + y_spacing)))
+        name_option.draw()
+        score_option.draw()
+        y_spacing += 50
+
+    while(True):
+        pygame.display.update()
+                            
+    cursor.close()
+    connection.close()
+    
 def collisionDetection(game, erase_color, enemies, projectiles, character):
     for enemy in enemies:
         # player and enemies
@@ -336,8 +372,8 @@ accuracyText = font.render("Accuracy: ", True, WHITE, BLACK)
 accuracyRect = accuracyText.get_rect()
 
 # set main menu options
-mainMenuOptions = [Option(DISPLAYSURF, BLUE, font, "PLAY", (config.display_x // 2 - 40, config.display_y // 2 - 100)), Option(DISPLAYSURF, BLUE, font, "SETTINGS", (config.display_x // 2 - 80, config.display_y // 2)),
-           Option(DISPLAYSURF, BLUE, font, "QUIT", (config.display_x // 2 - 40, config.display_y // 2 + 100))]
+mainMenuOptions = [Option(DISPLAYSURF, BLUE, font, "PLAY", (config.display_x // 2 - 40, config.display_y // 2 - 150)), Option(DISPLAYSURF, BLUE, font, "LEADERBOARD", (config.display_x // 2 - 110, config.display_y // 2 - 50)), Option(DISPLAYSURF, BLUE, font, "SETTINGS", (config.display_x // 2 - 80, config.display_y // 2 + 50)),
+           Option(DISPLAYSURF, BLUE, font, "QUIT", (config.display_x // 2 - 40, config.display_y // 2 + 150))]
 
 # set up sounds
 pygame.mixer.init(frequency=22050, size=-16, channels=8, buffer=4096)

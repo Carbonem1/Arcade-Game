@@ -26,5 +26,5 @@ class Config:
     # database setup
     USER = 'root'
     PASSWORD = 'ArcadeGame2016!'
-    HOST = '10.0.2.20'
+    HOST = '192.168.1.220'
     DATABASE = 'slyc'
