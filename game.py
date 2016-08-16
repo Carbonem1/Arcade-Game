@@ -1,10 +1,11 @@
 # Thanks to MillionthVector for the sprites
 import os
 import random
-import pygame
 import sys
 import ctypes
 import mysql.connector
+import inputbox
+import pygame
 from pygame.locals import *
 
 from option import Option
@@ -67,6 +68,7 @@ def drawMainMenu(DISPLAYSURF):
                         if option.text == "PLAY":
                             DISPLAYSURF.fill((0,0,0))
                             option.hovered = False
+                            drawNameMenu(DISPLAYSURF)
                             return False
                         if option.text == "SETTINGS":
                             option.hovered = False
@@ -83,6 +85,12 @@ def drawMainMenu(DISPLAYSURF):
         pygame.display.update()
     return True
 
+def drawNameMenu(DISPLAYSURF):
+    # get the users input for their name
+    statistics.name = inputbox.ask(DISPLAYSURF, 'Name ')
+    DISPLAYSURF.fill((0,0,0))
+    return
+    
 def drawPlayAgainMenu(DISPLAYSURF):
     play_again_option = Option(DISPLAYSURF, WHITE, font, "PLAY AGAIN?", (config.display_x // 2 - 100, config.display_y // 2 - 100))
     while (True):
@@ -403,8 +411,8 @@ mainMenuOptions = [Option(DISPLAYSURF, BLUE, font, "PLAY", (config.display_x // 
 # set up sounds
 pygame.mixer.init(frequency=22050, size=-16, channels=8, buffer=4096)
 
-pygame.mixer.music.load("audio/background_music.wav")
-pygame.mixer.music.play(-1)
+sound_background_music = pygame.mixer.Sound("audio/background_music.wav")
+sound_background_music.play(-1)
 
 sound_select_menu_item = pygame.mixer.Sound("audio/select_menu_item.wav")
 sound_hover_menu_item = pygame.mixer.Sound("audio/hover_menu_item.wav")
@@ -412,6 +420,15 @@ sound_shoot = pygame.mixer.Sound("audio/laser_shot.wav")
 sound_enemy_hit = pygame.mixer.Sound("audio/enemy_hit.wav")
 sound_death = pygame.mixer.Sound("audio/death.wav")
 sound_ship_upgrade = pygame.mixer.Sound("audio/ship_upgrade.wav")
+
+# set volume for each sound
+sound_background_music.set_volume(.15)
+sound_select_menu_item.set_volume(.3)
+sound_hover_menu_item.set_volume(1)
+sound_shoot.set_volume(.05)
+sound_enemy_hit.set_volume(.10)
+sound_death.set_volume(.15)
+sound_ship_upgrade.set_volume(.5)
 
 while True:
     #draw the main menu
