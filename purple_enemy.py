@@ -4,21 +4,26 @@ import pygame
 import sys
 from pygame.locals import *
 
+from config import Config
+
 from enemy import Enemy
 
 from random import randint
 
 class PurpleEnemy(object, Enemy):
+    config = Config()
+
     size = 30
     x_coordinate = 0
     y_coordinate = 0
     old_x_coordinate = 0
     old_y_coordinate = 0
-    spawn_speed = 900
+    spawn_speed = 1800
+    spawn_speed_min = 500
     spawn_speed_count = 0
-    speed = 20
+    speed = 15
     speed_count = 0
-    dodge_speed = 2
+    dodge_speed = 1
     dodge_speed_count = 0
 
     def __init__(self, x_start, y_start):

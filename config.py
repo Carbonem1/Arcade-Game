@@ -20,11 +20,11 @@ class Config:
     spawn_buffer = 220
 
     # set event frequency
-    event_spawn_speed = 5000
+    event_spawn_speed = 6000
     event_spawn_speed_count = 0
 
     # database setup
     USER = 'root'
     PASSWORD = 'ArcadeGame2016!'
-    HOST = '172.16.15.108'
+    HOST = '172.16.10.101'
     DATABASE = 'slyc'

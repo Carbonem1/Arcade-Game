@@ -6,17 +6,22 @@ import math
 from pygame.locals import *
 from pygame import gfxdraw
 
+from config import Config
+
 from enemy import Enemy
 
 class BlueEnemy(object, Enemy):
+    config = Config()
+
     size = 20
     x_coordinate = 0
     y_coordinate = 0
     old_x_coordinate = 0
     old_y_coordinate = 0
-    spawn_speed = 400
+    spawn_speed = 800
+    spawn_speed_min = 100
     spawn_speed_count = 0
-    speed = 5
+    speed = 6
     speed_count = 0
     movement_vector = 0
 

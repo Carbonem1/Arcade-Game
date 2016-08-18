@@ -35,7 +35,7 @@ def insertPlayerRecord(name, total_kills, total_deaths, blue_kills, green_kills,
     cursor = connection.cursor(buffered = True)
 
     # insert player with name, and score
-    addPlayer = ("INSERT INTO high_scores "
+    addPlayer = ("INSERT INTO players "
            "(name, total_kills, total_deaths, blue_kills, green_kills, red_kills, purple_kills, shots_fired, shots_hit, accuracy)"
            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     dataPlayer = (name, total_kills, total_deaths, blue_kills, green_kills, red_kills, purple_kills, shots_fired, shots_hit, accuracy)
@@ -90,7 +90,7 @@ def drawNameMenu(DISPLAYSURF):
     statistics.name = inputbox.ask(DISPLAYSURF, 'Name ')
     DISPLAYSURF.fill((0,0,0))
     return
-    
+
 def drawPlayAgainMenu(DISPLAYSURF):
     play_again_option = Option(DISPLAYSURF, WHITE, font, "PLAY AGAIN?", (config.display_x // 2 - 100, config.display_y // 2 - 100))
     while (True):
@@ -110,7 +110,7 @@ def drawPlayAgainMenu(DISPLAYSURF):
                     if event.type == MOUSEBUTTONUP:
                         # play sound
                         sound_select_menu_item.play()
-    
+
                         if option.text == "YES":
                             os.execl(sys.executable, sys.executable, *sys.argv)
                             return False
@@ -122,7 +122,7 @@ def drawPlayAgainMenu(DISPLAYSURF):
                         option.hovered = False
                 else:
                     option.hovered = False
-                
+
         pygame.display.update()
     return True
 
@@ -191,14 +191,14 @@ def drawLeaderboardMenu(DISPLAYSURF):
 
     x_spacing = 250
     y_spacing = 0
-        
+
     for (name, score) in cursor:
         name_option = Option(DISPLAYSURF, BLUE, font, "Name: " + str(name), (config.display_x // 2 - config.display_x // 4, (config.display_y // 5 + y_spacing)))
         score_option = Option(DISPLAYSURF, BLUE, font, "Score: " + str(score), (config.display_x // 2 + config.display_x // 10, (config.display_y // 5 + y_spacing)))
         name_option.draw()
         score_option.draw()
         y_spacing += 50
-        
+
     back_option = Option(DISPLAYSURF, BLUE, font, "BACK", (config.display_x // 2 - len("BACK") * 10, (config.display_y - 100)))
     while(True):
         for event in pygame.event.get():
@@ -218,7 +218,7 @@ def drawLeaderboardMenu(DISPLAYSURF):
         back_option.draw()
     cursor.close()
     connection.close()
-    
+
 def collisionDetection(game, erase_color, enemies, projectiles, character):
     for enemy in enemies:
         # player and enemies
@@ -271,7 +271,7 @@ def eventBlueCorner():
     # generate random corner
     corner = randint(1, 4)
     # generate a random number based on difficulty
-    blues_generated = random.uniform(config.difficulty, config.difficulty * 2)
+    blues_generated = random.uniform(config.difficulty // 5, config.difficulty // 3)
     while blues_generated > 0:
         # initialize each blue enemy in a random location based on corner
         # top left
@@ -293,8 +293,6 @@ def eventBlueCorner():
 
         new_blue_enemy = BlueEnemy(new_blue_x, new_blue_y)
         blues_generated -= 1
-
-
 
 pygame.init()
 
@@ -487,7 +485,7 @@ while True:
     # generate new blue enemies
     if blue_enemy.spawn_speed_count == blue_enemy.spawn_speed:
         # generate a random number based on difficulty
-        blues_generated = random.uniform(config.difficulty, config.difficulty + 1)
+        blues_generated = random.uniform(1, 1)
         while blues_generated > 0:
             # initialize each blue enemy in a random location
             new_blue_x = randint(0, config.display_x)
@@ -496,13 +494,15 @@ while True:
             if not (abs(new_blue_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_blue_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
                 new_blue_enemy = BlueEnemy(new_blue_x, new_blue_y)
                 blues_generated -= 1
+                if blue_enemy.spawn_speed > blue_enemy.spawn_speed_min:
+                    blue_enemy.spawn_speed -= int(config.difficulty)
         blue_enemy.spawn_speed_count = 0
     blue_enemy.spawn_speed_count += 1
 
     # generate new green enemies
     if green_enemy.spawn_speed_count == green_enemy.spawn_speed:
         # generate a random number based on difficulty
-        greens_generated = random.uniform(config.difficulty, config.difficulty + 1)
+        greens_generated = random.uniform(1, 1)
         while greens_generated > 0:
             # initialize each green enemy in a random location
             new_green_x = randint(0, config.display_x)
@@ -511,13 +511,15 @@ while True:
             if not (abs(new_green_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_green_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
                 new_green_enemy = GreenEnemy(new_green_x, new_green_y)
                 greens_generated -= 1
+                if green_enemy.spawn_speed > green_enemy.spawn_speed_min:
+                    green_enemy.spawn_speed -= int(config.difficulty)
         green_enemy.spawn_speed_count = 0
     green_enemy.spawn_speed_count += 1
 
     # generate new red enemies
     if red_enemy.spawn_speed_count == red_enemy.spawn_speed:
         # generate a random number based on difficulty
-        reds_generated = random.uniform(0, 1)
+        reds_generated = random.uniform(1, 1)
         while reds_generated > 0:
             # initialize each red enemy in a random location
             new_red_x = randint(0, config.display_x)
@@ -526,13 +528,15 @@ while True:
             if not ((abs(new_red_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer)) and (abs(new_red_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer))):
                 new_red_enemy = RedEnemy(new_red_x, new_red_y)
                 reds_generated -= 1
+                if red_enemy.spawn_speed > red_enemy.spawn_speed_min:
+                    red_enemy.spawn_speed -= int(config.difficulty)
         red_enemy.spawn_speed_count = 0
     red_enemy.spawn_speed_count += 1
 
     # generate new purple enemies
     if purple_enemy.spawn_speed_count == purple_enemy.spawn_speed:
         # generate a random number based on difficulty
-        purples_generated = random.uniform(config.difficulty, config.difficulty + 1)
+        purples_generated = random.uniform(1, 1)
         while purples_generated > 0:
             # initialize each purple enemy in a random location
             new_purple_x = randint(0, config.display_x)
@@ -541,6 +545,8 @@ while True:
             if not (abs(new_purple_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_purple_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
                 new_purple_enemy = PurpleEnemy(new_purple_x, new_purple_y)
                 purples_generated -= 1
+                if purple_enemy.spawn_speed > purple_enemy.spawn_speed_min:
+                    purple_enemy.spawn_speed -= int(config.difficulty)
         purple_enemy.spawn_speed_count = 0
     purple_enemy.spawn_speed_count += 1
 

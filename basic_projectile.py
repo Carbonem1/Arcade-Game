@@ -51,8 +51,8 @@ class BasicProjectile(Projectile):
                 direction = [distance[0] / norm, distance[1] / norm]
                 self.bullet_vector = [direction[0], direction[1]]
 
-            self.x_coordinate += self.bullet_vector[0]
-            self.y_coordinate += self.bullet_vector[1]
+            self.x_coordinate += self.bullet_vector[0] * 1.5
+            self.y_coordinate += self.bullet_vector[1] * 1.5
             self.speed_count = 0
 
         self.speed_count += 1

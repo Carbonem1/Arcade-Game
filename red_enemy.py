@@ -6,9 +6,13 @@ from pygame.locals import *
 
 from random import randint
 
+from config import Config
+
 from enemy import Enemy
 
 class RedEnemy(object, Enemy):
+    config = Config()
+
     size = 6
     length = 150
 
@@ -20,7 +24,8 @@ class RedEnemy(object, Enemy):
     y_coordinate = 0
 
     # lower speed value = faster
-    spawn_speed = 3000
+    spawn_speed = 6000
+    spawn_speed_min = 800
     spawn_speed_count = 0
     speed = 3
     speed_count = 0
