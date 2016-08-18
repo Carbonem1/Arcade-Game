@@ -27,6 +27,7 @@ from green_enemy import GreenEnemy
 from red_enemy import RedEnemy
 from purple_enemy import PurpleEnemy
 
+# ---------- SQL Inserts ----------
 # insert high score record
 def insertPlayerRecord(name, total_kills, total_deaths, blue_kills, green_kills, red_kills, purple_kills, shots_fired, shots_hit, accuracy):
     # establish connection to the server
@@ -47,6 +48,8 @@ def insertPlayerRecord(name, total_kills, total_deaths, blue_kills, green_kills,
     cursor.close()
     connection.close()
 
+# ---------- Draw Menus ----------
+# draw main menu (displays all options thats hould be accessable through the main menu for the user)
 def drawMainMenu(DISPLAYSURF):
     DISPLAYSURF.fill((0,0,0))
     while(True):
@@ -85,12 +88,14 @@ def drawMainMenu(DISPLAYSURF):
         pygame.display.update()
     return True
 
+# draw name menu (get the name of the player)
 def drawNameMenu(DISPLAYSURF):
     # get the users input for their name
     statistics.name = inputbox.ask(DISPLAYSURF, 'Name ')
     DISPLAYSURF.fill((0,0,0))
     return
 
+# draw play again menu (after the game is over, allow the player to play again, exit, or return to the main menu)
 def drawPlayAgainMenu(DISPLAYSURF):
     play_again_option = Option(DISPLAYSURF, WHITE, font, "PLAY AGAIN?", (config.display_x // 2 - 100, config.display_y // 2 - 100))
     while (True):
@@ -126,6 +131,7 @@ def drawPlayAgainMenu(DISPLAYSURF):
         pygame.display.update()
     return True
 
+# draw statistics menu (after the game is over, show the player their statistics for that game)
 def drawStatsMenu(DISPLAYSURF):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -173,6 +179,7 @@ def drawStatsMenu(DISPLAYSURF):
 
     pygame.display.update()
 
+# draw leaderboard menu (query database and return players names and scores for the leaderboard)
 def drawLeaderboardMenu(DISPLAYSURF):
     DISPLAYSURF.fill((0,0,0))
     for event in pygame.event.get():
@@ -219,6 +226,7 @@ def drawLeaderboardMenu(DISPLAYSURF):
     cursor.close()
     connection.close()
 
+# ---------- Collision Detection ----------
 def collisionDetection(game, erase_color, enemies, projectiles, character):
     for enemy in enemies:
         # player and enemies
@@ -266,42 +274,200 @@ def collisionDetection(game, erase_color, enemies, projectiles, character):
                     # play sound
                     sound_ship_upgrade.play()
 
-# events
+# ---------- Events ----------
+# blue corner (spawn a group of blue enemies in a random corner)
 def eventBlueCorner():
-    # generate random corner
-    corner = randint(1, 4)
-    # generate a random number based on difficulty
-    blues_generated = random.uniform(config.difficulty // 5, config.difficulty // 3)
-    while blues_generated > 0:
-        # initialize each blue enemy in a random location based on corner
-        # top left
-        if corner == 1:
-            new_blue_x = randint(0, 100)
-            new_blue_y = randint(0, 100)
-        # top right
-        if corner == 2:
-            new_blue_x = randint(config.display_x - 100, config.display_x)
-            new_blue_y = randint(0, 100)
-        # bottom left
-        if corner == 3:
-            new_blue_x = randint(0, 100)
-            new_blue_y = randint(config.display_y - 100, config.display_y)
-        if corner == 4:
-        # bottom right
-            new_blue_x = randint(config.display_x - 100, config.display_x)
-            new_blue_y = randint(config.display_y - 100, config.display_y)
+    if config.event_spawn_speed_count == config.event_spawn_speed:
+        # generate random corner
+        corner = randint(1, 4)
+        # generate a random number based on difficulty
+        blues_generated = random.uniform(config.difficulty // 5, config.difficulty // 3)
+        while blues_generated > 0:
+            # initialize each blue enemy in a random location based on corner
+            # top left
+            if corner == 1:
+                new_blue_x = randint(0, 100)
+                new_blue_y = randint(0, 100)
+            # top right
+            if corner == 2:
+                new_blue_x = randint(config.display_x - 100, config.display_x)
+                new_blue_y = randint(0, 100)
+            # bottom left
+            if corner == 3:
+                new_blue_x = randint(0, 100)
+                new_blue_y = randint(config.display_y - 100, config.display_y)
+            if corner == 4:
+            # bottom right
+                new_blue_x = randint(config.display_x - 100, config.display_x)
+                new_blue_y = randint(config.display_y - 100, config.display_y)
 
-        new_blue_enemy = BlueEnemy(new_blue_x, new_blue_y)
-        blues_generated -= 1
+            new_blue_enemy = BlueEnemy(new_blue_x, new_blue_y)
+            blues_generated -= 1
 
+            config.event_spawn_speed_count = 0
+    else:
+        config.event_spawn_speed_count += 1
+
+# ---------- Generate Enemies ----------
+def generateAllEnemies():
+    generateBlueEnemies()
+    generateGreenEnemies()
+    generateRedEnemies()
+    generatePurpleEnemies()
+
+def generateBlueEnemies():
+    # generate new blue enemies
+    if blue_enemy.spawn_speed_count == blue_enemy.spawn_speed:
+        # generate a random number based on difficulty
+        blues_generated = random.uniform(1, 1)
+        while blues_generated > 0:
+            # initialize each blue enemy in a random location
+            new_blue_x = randint(0, config.display_x)
+            new_blue_y = randint(0, config.display_y)
+            # if it is too close to the player, dont spawn
+            if not (abs(new_blue_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_blue_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
+                new_blue_enemy = BlueEnemy(new_blue_x, new_blue_y)
+                blues_generated -= 1
+                if blue_enemy.spawn_speed > blue_enemy.spawn_speed_min:
+                    blue_enemy.spawn_speed -= int(config.difficulty)
+        blue_enemy.spawn_speed_count = 0
+    blue_enemy.spawn_speed_count += 1
+    
+def generateGreenEnemies():
+    # generate new green enemies
+    if green_enemy.spawn_speed_count == green_enemy.spawn_speed:
+        # generate a random number based on difficulty
+        greens_generated = random.uniform(1, 1)
+        while greens_generated > 0:
+            # initialize each green enemy in a random location
+            new_green_x = randint(0, config.display_x)
+            new_green_y = randint(0, config.display_y)
+            # if it is too close to the player, dont spawn
+            if not (abs(new_green_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_green_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
+                new_green_enemy = GreenEnemy(new_green_x, new_green_y)
+                greens_generated -= 1
+                if green_enemy.spawn_speed > green_enemy.spawn_speed_min:
+                    green_enemy.spawn_speed -= int(config.difficulty)
+        green_enemy.spawn_speed_count = 0
+    green_enemy.spawn_speed_count += 1
+    
+def generateRedEnemies():
+    # generate new red enemies
+    if red_enemy.spawn_speed_count == red_enemy.spawn_speed:
+        # generate a random number based on difficulty
+        reds_generated = random.uniform(1, 1)
+        while reds_generated > 0:
+            # initialize each red enemy in a random location
+            new_red_x = randint(0, config.display_x)
+            new_red_y = randint(0, config.display_y)
+            # if it is too close to the player, dont spawn (also, dont let it spawn longer than 50px)
+            if not ((abs(new_red_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer)) and (abs(new_red_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer))):
+                new_red_enemy = RedEnemy(new_red_x, new_red_y)
+                reds_generated -= 1
+                if red_enemy.spawn_speed > red_enemy.spawn_speed_min:
+                    red_enemy.spawn_speed -= int(config.difficulty)
+        red_enemy.spawn_speed_count = 0
+    red_enemy.spawn_speed_count += 1
+    
+def generatePurpleEnemies():
+    # generate new purple enemies
+    if purple_enemy.spawn_speed_count == purple_enemy.spawn_speed:
+        # generate a random number based on difficulty
+        purples_generated = random.uniform(1, 1)
+        while purples_generated > 0:
+            # initialize each purple enemy in a random location
+            new_purple_x = randint(0, config.display_x)
+            new_purple_y = randint(0, config.display_y)
+            # if it is too close to the player, dont spawn
+            if not (abs(new_purple_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_purple_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
+                new_purple_enemy = PurpleEnemy(new_purple_x, new_purple_y)
+                purples_generated -= 1
+                if purple_enemy.spawn_speed > purple_enemy.spawn_speed_min:
+                    purple_enemy.spawn_speed -= int(config.difficulty)
+        purple_enemy.spawn_speed_count = 0
+    purple_enemy.spawn_speed_count += 1
+    
+# ---------- Draw Enemies ----------
+def drawEnemies():
+    drawBlueEnemeies()
+    drawGreenEnemies()
+    drawRedEnemies()
+    drawPurpleEnemies()
+
+def drawBlueEnemeies():
+    # draw in any blue enemies
+    for enemy in blue_enemy.getBlueEnemyList():
+        enemy.drawBlueEnemy(DISPLAYSURF, BLUE, background_color)
+        
+def drawGreenEnemies():
+    # draw in any green enemies
+    for enemy in green_enemy.getGreenEnemyList():
+        enemy.drawGreenEnemy(DISPLAYSURF, GREEN, background_color)
+        
+def drawRedEnemies():
+    # draw in any red enemies
+    for enemy in red_enemy.getRedEnemyList():
+        enemy.drawRedEnemy(DISPLAYSURF, RED, background_color)
+        
+def drawPurpleEnemies():
+    # draw in any purple enemies
+    for enemy in purple_enemy.getPurpleEnemyList():
+        enemy.drawPurpleEnemy(DISPLAYSURF, PURPLE, background_color)
+
+# ---------- Draw Projectiles ----------
+def drawProjectiles():
+    # draw in any projectiles
+    for projectile in proj.getProjectileList():
+        projectile.drawProjectile(DISPLAYSURF, WHITE, background_color)
+
+# ---------- Move Enemies ----------
+def moveEnemies():
+    moveBlueEnemies()
+    moveGreenEnemies()
+    moveRedEnemies()
+    movePurpleEnemies()
+    
+def moveBlueEnemies():
+    # set all blue enemies in motion
+    for enemy in blue_enemy.getBlueEnemyList():
+            enemy.move(my_character)
+
+def moveGreenEnemies():
+    # set all green enemies in motion
+    for enemy in green_enemy.getGreenEnemyList():
+            enemy.move(my_character)
+
+def moveRedEnemies():
+    # set all red enemies in motion
+    for enemy in red_enemy.getRedEnemyList():
+            enemy.move(my_character)
+
+def movePurpleEnemies():
+    # set all purple enemies in motion
+    for enemy in purple_enemy.getPurpleEnemyList():
+            enemy.move(game_state)
+
+# ---------- Move Projectiles ----------
+def moveProjectiles():
+    # set all projectiles in motion
+    for projectile in proj.getProjectileList():
+        if (-20 < projectile.x_coordinate < config.display_x + 20) and (-20 < projectile.y_coordinate < config.display_y + 20):
+            projectile.move(mouse_x, mouse_y)
+        else:
+            projectile.remove(DISPLAYSURF, BLACK)
+
+# ---------- Game Initialization ----------
 pygame.init()
 
+# create config and statistics objetcs
 config = Config()
 statistics = Statistics()
 
+# set FPS
 fpsClock = pygame.time.Clock()
 fpsClock.tick(config.FPS)
 
+# get the users screen resolution (Windows only)
 user32 = ctypes.windll.user32
 screenSize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 config.display_x = screenSize[0]
@@ -322,7 +488,7 @@ pygame.display.set_caption(config.game_name, config.game_icon)
 # set the mouse to be invisible
 # pygame.mouse.set_visible(False)
 
-# colors
+# color constants
 BLACK = ( 0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -337,7 +503,7 @@ DISPLAYSURF.fill(background_color)
 # player init coordinates
 my_character = Character(config.display_x//2, config.display_y//2, "Basic", ("red", "1", ""))
 
-# player projectile
+# player projectile init
 proj = BasicProjectile(my_character)
 
 # enemy init
@@ -359,8 +525,7 @@ purple_enemy = PurpleEnemy(0, 0)
 mouse_x = 0
 mouse_y = 0
 
-
-# attempt ship rotate to cursor
+# load player ship
 space_ship = pygame.image.load("images/ships/blue/1/-north.png").convert_alpha()
 
 # set menu booleans
@@ -428,6 +593,7 @@ sound_enemy_hit.set_volume(.10)
 sound_death.set_volume(.15)
 sound_ship_upgrade.set_volume(.5)
 
+# ---------- Game Start ----------
 while True:
     #draw the main menu
     while intro:
@@ -436,14 +602,12 @@ while True:
     # set the game_state
     game_state = [my_character, proj.getProjectileList()]
 
-    # draw the text's background rectangle onto the surface
-    pygame.draw.rect(DISPLAYSURF, WHITE, (textRect.left, textRect.top, textRect.width, textRect.height))
-
     for event in pygame.event.get():
+        # get mouse position
         if event.type == MOUSEMOTION:
             mouse_x, mouse_y = event.pos
 
-        # shoot on mouse click
+        # generate projectile on mouse click
         if event.type == MOUSEBUTTONUP:
             mouse_x, mouse_y = event.pos
             my_character.shoot(DISPLAYSURF, WHITE, BLACK, my_character, mouse_x, mouse_y)
@@ -482,124 +646,20 @@ while True:
         my_character.speed_count = 0
     my_character.speed_count += 1
 
-    # generate new blue enemies
-    if blue_enemy.spawn_speed_count == blue_enemy.spawn_speed:
-        # generate a random number based on difficulty
-        blues_generated = random.uniform(1, 1)
-        while blues_generated > 0:
-            # initialize each blue enemy in a random location
-            new_blue_x = randint(0, config.display_x)
-            new_blue_y = randint(0, config.display_y)
-            # if it is too close to the player, dont spawn
-            if not (abs(new_blue_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_blue_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
-                new_blue_enemy = BlueEnemy(new_blue_x, new_blue_y)
-                blues_generated -= 1
-                if blue_enemy.spawn_speed > blue_enemy.spawn_speed_min:
-                    blue_enemy.spawn_speed -= int(config.difficulty)
-        blue_enemy.spawn_speed_count = 0
-    blue_enemy.spawn_speed_count += 1
-
-    # generate new green enemies
-    if green_enemy.spawn_speed_count == green_enemy.spawn_speed:
-        # generate a random number based on difficulty
-        greens_generated = random.uniform(1, 1)
-        while greens_generated > 0:
-            # initialize each green enemy in a random location
-            new_green_x = randint(0, config.display_x)
-            new_green_y = randint(0, config.display_y)
-            # if it is too close to the player, dont spawn
-            if not (abs(new_green_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_green_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
-                new_green_enemy = GreenEnemy(new_green_x, new_green_y)
-                greens_generated -= 1
-                if green_enemy.spawn_speed > green_enemy.spawn_speed_min:
-                    green_enemy.spawn_speed -= int(config.difficulty)
-        green_enemy.spawn_speed_count = 0
-    green_enemy.spawn_speed_count += 1
-
-    # generate new red enemies
-    if red_enemy.spawn_speed_count == red_enemy.spawn_speed:
-        # generate a random number based on difficulty
-        reds_generated = random.uniform(1, 1)
-        while reds_generated > 0:
-            # initialize each red enemy in a random location
-            new_red_x = randint(0, config.display_x)
-            new_red_y = randint(0, config.display_y)
-            # if it is too close to the player, dont spawn (also, dont let it spawn longer than 50px)
-            if not ((abs(new_red_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer)) and (abs(new_red_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer))):
-                new_red_enemy = RedEnemy(new_red_x, new_red_y)
-                reds_generated -= 1
-                if red_enemy.spawn_speed > red_enemy.spawn_speed_min:
-                    red_enemy.spawn_speed -= int(config.difficulty)
-        red_enemy.spawn_speed_count = 0
-    red_enemy.spawn_speed_count += 1
-
-    # generate new purple enemies
-    if purple_enemy.spawn_speed_count == purple_enemy.spawn_speed:
-        # generate a random number based on difficulty
-        purples_generated = random.uniform(1, 1)
-        while purples_generated > 0:
-            # initialize each purple enemy in a random location
-            new_purple_x = randint(0, config.display_x)
-            new_purple_y = randint(0, config.display_y)
-            # if it is too close to the player, dont spawn
-            if not (abs(new_purple_x - my_character.x_coordinate) <= (my_character.size + config.spawn_buffer) and abs(new_purple_y - my_character.y_coordinate) <= (my_character.size + config.spawn_buffer)):
-                new_purple_enemy = PurpleEnemy(new_purple_x, new_purple_y)
-                purples_generated -= 1
-                if purple_enemy.spawn_speed > purple_enemy.spawn_speed_min:
-                    purple_enemy.spawn_speed -= int(config.difficulty)
-        purple_enemy.spawn_speed_count = 0
-    purple_enemy.spawn_speed_count += 1
-
+    # generate new enemies
+    generateAllEnemies()
+    
     # generate new events
-    if config.event_spawn_speed_count == config.event_spawn_speed:
-        eventBlueCorner()
-        config.event_spawn_speed_count = 0
-    else:
-        config.event_spawn_speed_count += 1
+    eventBlueCorner()
 
-    # draw in any blue enemies
-    for enemy in blue_enemy.getBlueEnemyList():
-        enemy.drawBlueEnemy(DISPLAYSURF, BLUE, background_color)
+    # draw enemies and projectiles
+    drawEnemies()
+    drawProjectiles()
 
-    # draw in any green enemies
-    for enemy in green_enemy.getGreenEnemyList():
-        enemy.drawGreenEnemy(DISPLAYSURF, GREEN, background_color)
-
-    # draw in any red enemies
-    for enemy in red_enemy.getRedEnemyList():
-        enemy.drawRedEnemy(DISPLAYSURF, RED, background_color)
-
-    # draw in any purple enemies
-    for enemy in purple_enemy.getPurpleEnemyList():
-        enemy.drawPurpleEnemy(DISPLAYSURF, PURPLE, background_color)
-
-    # draw in any projectiles
-    for projectile in proj.getProjectileList():
-        projectile.drawProjectile(DISPLAYSURF, WHITE, background_color)
-
-    # set all blue enemies in motion
-    for enemy in blue_enemy.getBlueEnemyList():
-            enemy.move(my_character)
-
-    # set all green enemies in motion
-    for enemy in green_enemy.getGreenEnemyList():
-            enemy.move(my_character)
-
-    # set all red enemies in motion
-    for enemy in red_enemy.getRedEnemyList():
-            enemy.move(my_character)
-
-    # set all purple enemies in motion
-    for enemy in purple_enemy.getPurpleEnemyList():
-            enemy.move(game_state)
-
-    # set all projectiles in motion
-    for projectile in proj.getProjectileList():
-        if (-20 < projectile.x_coordinate < config.display_x + 20) and (-20 < projectile.y_coordinate < config.display_y + 20):
-            projectile.move(mouse_x, mouse_y)
-        else:
-            projectile.remove(DISPLAYSURF, BLACK)
-
+    # move enemies and projectiles
+    moveEnemies()
+    moveProjectiles()
+    
     # check for any collisions
     if collisionDetection(DISPLAYSURF, BLACK, enemy.getEnemyList(), proj.projectile_list, my_character) == True:
         # add player to the database
